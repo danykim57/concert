@@ -85,7 +85,7 @@
 #### 유저 토큰 발급
 ```mermaid
 sequenceDiagram
-    participant User as 사용자
+    actor User as 사용자
     participant API_Server as TokenController
     participant Queue_System as QueueService
     User->>API_Server: 토큰 발급 요청
@@ -93,81 +93,72 @@ sequenceDiagram
     Queue_System-->>API_Server: 대기열 정보
     API_Server-->>User: 토큰 발급 및 대기열 정보 반환
 ```
-
 #### 예약 가능 날짜
 ```mermaid
 sequenceDiagram
-    participant User as User
-    participant Server as Concert Server
-    participant DB as Database
+    actor User as 사용자
+    participant Server as ConcertController
+    participant DB as ConcertRepository
 
     User->>Server: 예약 가능 
-    Server->>DB: Query available concerts
-    DB-->>Server: Return concert list
-    Server-->>User: Send concert list
+    Server->>DB: 예약 가능한 콘서트 조회
+    DB-->>Server: 콘서트 리스트 조회 리턴
+    Server-->>User: 콘서트 리스트 전송
 ```
-
 #### 좌석 조회
 ```mermaid
 sequenceDiagram
-    participant User as User
-    participant UI as Concert Booking UI
-    participant Server as Concert Server
-    participant DB as Database
+    actor User as 사용자
+    participant Server as ConcertController
+    participant DB as ConcertRepository
 
-    User->>UI: Request available seats for concert
-    UI->>Server: Fetch available seats (concert ID)
-    Server->>DB: Query available seats (concert ID)
-    DB-->>Server: Return available seats list
-    Server-->>UI: Send available seats list
-    UI-->>User: Display available seats
+    User->>Server: 예약 가능한 좌석 조회 요청
+    Server->>DB: 예약 가능한 좌석 조회
+    DB-->>Server: 예약 가능한 좌석 리스트 리턴
+    Server-->>User: 예약 가능한 좌석 전송
 ```
-
 #### 좌석 예약 요청
 ```mermaid
 sequenceDiagram
-    participant User as User
-    participant Server as Concert Server
-    participant DB as Database
+    actor User as 사용자
+    participant Server as ConcertController
+    participant DB as ConcertRepository
     
-    User->>Server: Select seat and request reservation
-    Server->>DB: Check seat availability (seat ID)
-    DB-->>Server: Seat available
-    Server->>DB: Reserve seat (seat ID, user ID)
-    DB-->>Server: Confirm reservation
-    Server-->>User: Reservation success response
-```
-#### 잔액 충전
-```mermaid
-sequenceDiagram
-    participant User as User
-    participant PaymentGateway as Payment Gateway
-    participant Server as Wallet Server
-    participant DB as Wallet Database
-
-    User->>PaymentGateway: Submit payment details
-    PaymentGateway-->>UI: Payment success
-    UI->>Server: Notify server of successful payment (amount, user ID)
-    Server->>DB: Update balance in user account (user ID, amount)
-    DB-->>Server: Balance update success
-    Server-->>User: Confirm balance recharge
+    User->>Server: 좌석 예약 요청 전송
+    Server->>DB: 예약 가능한 좌석 예약 요청 
+    DB-->>Server: 예약 가능한 좌석 리스트 조회
+    Server->>DB: 좌석 예약 저장 업데이트
+    DB-->>Server: 좌석 예약 성공 반환
+    Server-->>User: 좌석 예약 성공 전송
 ```
 #### 잔액 조회
 ```mermaid
 sequenceDiagram
-    participant User as User
-    participant Server as Wallet Server
-    participant DB as Wallet Database
+    actor User as User
+    participant Server as PointController
+    participant DB as PointEntity
 
     User->>Server: Request to check balance
     Server->>DB: Query balance for user (user ID)
     DB-->>Server: Return user balance
     Server-->>User: Send balance information
 ```
+#### 잔액 충전
+```mermaid
+sequenceDiagram
+    actor User as User
+    participant Server as PointController
+    participant DB as PointRepository
+
+    User->>Server: Submit payment details
+    Server->>DB: Update balance in user account (user ID, amount)
+    DB-->>Server: Balance update success
+    Server-->>User: Confirm balance recharge
+```
 ## API 명세
 
 #### 유저 토큰 발급
-- **GET** ```/token```
+- **GET** ```/api/v1/token```
 - Request
   - ```json
     {
@@ -192,7 +183,7 @@ sequenceDiagram
       }
 
 #### 예약 가능한 콘서트 조회
-- **GET** ```/concert```
+- **GET** ```/api/v1/concert```
 - Response
   - ```200```
     - ```json
@@ -202,7 +193,7 @@ sequenceDiagram
       }
 
 #### 예약 가능 좌석 조회
-- **GET** ```/seat/{concertId} ```
+- **GET** ```/api/v1/seat/{concertId} ```
 - Response
   - ```200```
   - ```json
@@ -212,7 +203,7 @@ sequenceDiagram
     }
 
 #### 콘서트 예약 하기
-- **POST** ```/seat/{concertId} ```
+- **POST** ```/api/v1/seat/{concertId} ```
 - Request
   - ```json
     {
@@ -232,7 +223,7 @@ sequenceDiagram
     }
 
 #### 유저 포인트 조회
-- **GET** ```/user/{userId}/point```
+- **GET** ```/api/v1/user/{userId}/point```
 - Response
   - ```200```
   - ```json
@@ -241,7 +232,7 @@ sequenceDiagram
       "point": "123"
     }
 #### 유저 포인트 충전
-- **POST** ```/user/{userId}/charge ```
+- **POST** ```/api/v1/user/{userId}/charge ```
 - Request
   - ```json
     {
@@ -254,5 +245,3 @@ sequenceDiagram
       "code": "success",
       "point": "246"
     }
-
-## Mock API
