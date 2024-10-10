@@ -16,7 +16,7 @@ class PointController {
         )
     }
 
-    @PostMapping("user/{userId}/point")
+    @PutMapping("user/{userId}/point")
     fun addPoint(@PathVariable userId: Long, @RequestBody req: PointRequst): ResponseEntity<PointResponse> {
         return ResponseEntity.ok(PointResponse(
             code = "success",
