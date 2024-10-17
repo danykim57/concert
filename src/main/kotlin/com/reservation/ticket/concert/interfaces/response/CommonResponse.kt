@@ -1,4 +1,4 @@
-package com.reservation.ticket.concert.domain.dto.response
+package com.reservation.ticket.concert.interfaces.response
 
 data class CommonResponse(
     val code: String,
