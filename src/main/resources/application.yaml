@@ -34,6 +34,6 @@ springdoc:
     disable-swagger-default-url: true
     display-request-duration: true
     operations-sorter: alpha
-  paths-to-match: /api/**
+  paths-to-match: /**
   api-docs:
-    path: /concert-reservation-swagger/v3/api-docs
+    path: /concert-swagger/v3/api-docs
