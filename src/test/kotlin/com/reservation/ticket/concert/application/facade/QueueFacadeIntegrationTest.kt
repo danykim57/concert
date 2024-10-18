@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.*
+import org.mockito.kotlin.anyOrNull
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.mock.mockito.MockBean
@@ -102,7 +103,7 @@ class QueueFacadeIntegrationTest {
 
         // 검증: 유저를 찾지 못한 경우 콘서트와 큐 서비스가 호출되지 않아야 함
         verify(concertService, never()).get(anyString())
-        verify(queueService, never()).createQueue(any(), any())
+        verify(queueService, never()).createQueue(anyOrNull(), anyOrNull())
     }
 
     @Test
@@ -119,6 +120,6 @@ class QueueFacadeIntegrationTest {
         assertEquals("Concert not found", exception.message)
 
         // 검증: 콘서트를 찾지 못한 경우 큐 서비스가 호출되지 않아야 함
-        verify(queueService, never()).createQueue(any(), any())
+        verify(queueService, never()).createQueue(anyOrNull(), anyOrNull())
     }
 }
