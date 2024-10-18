@@ -50,7 +50,8 @@ class BookingFacadeTest(
             Seat(
                 seatNumber = "A1",
                 isAvailable = true,
-                concert = concert
+                concert = concert,
+                price = 10.0
             )
         )
     }

@@ -34,7 +34,8 @@ class SeatServiceIntegrationTest(
         val seat1 = Seat(
             seatNumber = "A1",
             isAvailable = true,
-            concert = concert
+            concert = concert,
+            price = 10.0
         )
         seatRepository.save(seat1)
 
@@ -42,7 +43,8 @@ class SeatServiceIntegrationTest(
         val seat2 = Seat(
             seatNumber = "A2",
             isAvailable = true,
-            concert = concert
+            concert = concert,
+            price = 10.0
         )
         seatRepository.save(seat2)
     }

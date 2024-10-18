@@ -33,8 +33,8 @@ class SeatServiceTest {
             Concert(id = 2L, name = "Concert 2", location = "Austin City Limits", date = now, availableTickets = 48)
         )
         val availableSeats = listOf(
-            Seat(id = 1L, seatNumber = "A1", isAvailable = true, concert = concerts.get(0), createdAt = now, updatedAt = now),
-            Seat(id = 2L, seatNumber = "A2", isAvailable = true, concert = concerts.get(1), createdAt = now, updatedAt = now)
+            Seat(id = 1L, seatNumber = "A1", isAvailable = true, concert = concerts.get(0), price = 10.0),
+            Seat(id = 2L, seatNumber = "A2", isAvailable = true, concert = concerts.get(1), price = 10.0)
         )
 
         // Mocking the repository behavior
