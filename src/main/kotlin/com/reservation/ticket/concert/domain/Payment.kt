@@ -5,18 +5,26 @@ import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.annotation.LastModifiedDate
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
 import java.time.LocalDateTime
+import java.util.*
+
 
 @Entity
 @EntityListeners(AuditingEntityListener::class)
-data class Point(
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long = 0,                    // 포인트 엔티티의 고유 ID
+data class Payment(
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    val id: Long = 0L,
 
-    var amount: Double,                     // 포인트 금액
+    @Column(nullable = false)
+    val userId: UUID,
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", referencedColumnName = "id")
-    val user: User,
+    @Column(nullable = false)
+    val reservationId: Long,
+
+    @Column(nullable = false)
+    val amount: Double,
+
+    val type: PaymentType,
 
     @CreatedDate  // 엔티티가 생성될 때 자동으로 설정됨
     @Column(nullable = false, updatable = false)

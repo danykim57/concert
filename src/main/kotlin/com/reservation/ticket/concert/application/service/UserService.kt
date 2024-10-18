@@ -42,6 +42,21 @@ class UserService(
         }
     }
 
+    @Transactional
+    fun spend(request: PointRequest) {
+        val point = pointRepository.findByUserId(request.userId)
+
+        if (point == null) {
+            // 포인트 정보가 없는 경우 새로운 포인트 엔티티 생성
+            val newPoint = Point(amount = request.amount, user = User(id = request.userId)) // 유저 엔티티가 필요
+            pointRepository.save(newPoint)
+        } else {
+            point.amount -= request.amount
+            if (point.amount < 0) { throw IllegalArgumentException("포인트가 부족합니다.")}
+            pointRepository.save(point)
+        }
+    }
+
 
 
 }

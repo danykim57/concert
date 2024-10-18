@@ -13,12 +13,18 @@ data class Seat(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0,
 
+    @Column
     val seatNumber: String,
+
+    @Column
     var isAvailable: Boolean = true,
 
     @ManyToOne
     @JoinColumn(name = "concert_id")
     val concert: Concert,
+
+    @Column
+    var price: Double,
 
     @Version
     var version: Long? = null,
