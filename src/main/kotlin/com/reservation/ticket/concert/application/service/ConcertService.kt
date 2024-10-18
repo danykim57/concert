@@ -1,5 +1,6 @@
 package com.reservation.ticket.concert.application.service
 
+import com.reservation.ticket.concert.application.token.QueueStatusChecker
 import com.reservation.ticket.concert.domain.Concert
 import com.reservation.ticket.concert.infrastructure.ConcertRepository
 import org.springframework.stereotype.Service
@@ -7,7 +8,7 @@ import java.util.*
 
 @Service
 class ConcertService(
-    private val concertRepository: ConcertRepository
+    private val concertRepository: ConcertRepository,
 ) {
     fun get(name: String): Concert = concertRepository.findByName(name)
         ?: throw IllegalArgumentException("유효하지 않은 콘서트 입니다.")
