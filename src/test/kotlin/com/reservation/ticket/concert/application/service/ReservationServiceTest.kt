@@ -14,6 +14,9 @@ import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.Mockito.*
 import org.mockito.MockitoAnnotations
+
+import org.mockito.kotlin.anyOrNull
+
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import java.time.LocalDateTime
 import java.util.*
@@ -60,7 +63,8 @@ class ReservationServiceTest {
     fun `should throw exception if reservation does not exist`() {
         // Given
         val reservationId = 1L
-        `when`(reservationRepository.findById(reservationId)).thenReturn(Optional.empty())
+
+        `when`(reservationRepository.findById(anyOrNull())).thenReturn(Optional.empty())
 
         // When/Then
         val exception = assertThrows<IllegalArgumentException> {
@@ -74,8 +78,9 @@ class ReservationServiceTest {
     fun `should throw exception if user does not exist`() {
         // Given
         val reservation = mockReservation()
-        `when`(reservationRepository.findById(reservation.id)).thenReturn(Optional.of(reservation))
-        `when`(userRepository.findById(reservation.userId)).thenReturn(Optional.empty())
+
+        `when`(reservationRepository.findById(anyOrNull())).thenReturn(Optional.of(reservation))
+        `when`(userRepository.findById(anyOrNull())).thenReturn(Optional.empty())
 
         // When/Then
         val exception = assertThrows<IllegalArgumentException> {
@@ -92,11 +97,11 @@ class ReservationServiceTest {
         val seat = reservation.seat
         val queue = mockQueue(userId = reservation.userId)
 
-        `when`(reservationRepository.findById(reservation.id)).thenReturn(Optional.of(reservation))
-        `when`(userRepository.findById(reservation.userId)).thenReturn(Optional.of(mockUser(reservation.userId)))
-        `when`(concertRepository.findById(reservation.concert.id)).thenReturn(Optional.of(reservation.concert))
-        `when`(seatRepository.findById(reservation.seat.id)).thenReturn(Optional.of(seat))
-        `when`(queueRepository.findByUserId(reservation.userId)).thenReturn(queue)
+        `when`(reservationRepository.findById(anyOrNull())).thenReturn(Optional.of(reservation))
+        `when`(userRepository.findById(anyOrNull())).thenReturn(Optional.of(mockUser(reservation.userId)))
+        `when`(concertRepository.findById(anyOrNull())).thenReturn(Optional.of(reservation.concert))
+        `when`(seatRepository.findById(anyOrNull())).thenReturn(Optional.of(seat))
+        `when`(queueRepository.findByUserId(anyOrNull())).thenReturn(queue)
 
         // When/Then
         val exception = assertThrows<IllegalArgumentException> {
@@ -117,9 +122,10 @@ class ReservationServiceTest {
         val reservation = mockReservation()
         val user = mockUser(reservation.userId)
         val point = Point(user = user, amount = 50.0) // 부족한 포인트
-        `when`(reservationRepository.findById(reservation.id)).thenReturn(Optional.of(reservation))
-        `when`(userRepository.findById(reservation.userId)).thenReturn(Optional.of(user))
-        `when`(pointRepository.findByUserId(reservation.userId)).thenReturn(point)
+
+        `when`(reservationRepository.findById(anyOrNull())).thenReturn(Optional.of(reservation))
+        `when`(userRepository.findById(anyOrNull())).thenReturn(Optional.of(user))
+        `when`(pointRepository.findByUserId(anyOrNull())).thenReturn(point)
 
         // When/Then
         val exception = assertThrows<IllegalArgumentException> {
@@ -135,9 +141,10 @@ class ReservationServiceTest {
         val reservation = mockReservation()
         val user = mockUser(reservation.userId)
         val point = Point(user = user, amount = 200.0) // 충분한 포인트
-        `when`(reservationRepository.findById(reservation.id)).thenReturn(Optional.of(reservation))
-        `when`(userRepository.findById(reservation.userId)).thenReturn(Optional.of(user))
-        `when`(pointRepository.findByUserId(reservation.userId)).thenReturn(point)
+
+        `when`(reservationRepository.findById(anyOrNull())).thenReturn(Optional.of(reservation))
+        `when`(userRepository.findById(anyOrNull())).thenReturn(Optional.of(user))
+        `when`(pointRepository.findByUserId(anyOrNull())).thenReturn(point)
 
         // When
         val result = reservationService.confirmReservation(reservation.id)
@@ -175,4 +182,5 @@ class ReservationServiceTest {
         concert = mockConcert(),
         token = UUID.randomUUID()
     )
+
 }

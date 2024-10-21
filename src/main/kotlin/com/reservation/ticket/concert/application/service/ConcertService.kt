@@ -9,6 +9,7 @@ import java.util.*
 @Service
 class ConcertService(
     private val concertRepository: ConcertRepository,
+    private val queueStatusChecker: QueueStatusChecker,
 ) {
     fun get(name: String): Concert = concertRepository.findByName(name)
         ?: throw IllegalArgumentException("유효하지 않은 콘서트 입니다.")

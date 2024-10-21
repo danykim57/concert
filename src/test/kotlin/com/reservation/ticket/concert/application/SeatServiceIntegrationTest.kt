@@ -35,7 +35,7 @@ class SeatServiceIntegrationTest(
             seatNumber = "A1",
             isAvailable = true,
             concert = concert,
-            price = 200.0
+            price = 10.0
         )
         seatRepository.save(seat1)
 
@@ -44,7 +44,7 @@ class SeatServiceIntegrationTest(
             seatNumber = "A2",
             isAvailable = true,
             concert = concert,
-            price = 200.0
+            price = 10.0
         )
         seatRepository.save(seat2)
     }
