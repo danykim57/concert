@@ -1,5 +1,6 @@
 package com.reservation.ticket.concert.application.facade
 
+import org.junit.jupiter.api.Assertions.*
 import com.reservation.ticket.concert.application.service.ConcertService
 import com.reservation.ticket.concert.application.service.QueueService
 import com.reservation.ticket.concert.application.service.UserService

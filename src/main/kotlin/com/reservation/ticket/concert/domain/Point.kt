@@ -17,6 +17,7 @@ data class Point(
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     val user: User,
+
     @CreatedDate  // 엔티티가 생성될 때 자동으로 설정됨
     @Column(nullable = false, updatable = false)
     var createdAt: LocalDateTime? = null,

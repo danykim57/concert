@@ -3,8 +3,11 @@ package com.reservation.ticket.concert.interfaces.api.concert
 import com.reservation.ticket.concert.application.facade.BookingFacade
 import com.reservation.ticket.concert.application.service.ConcertService
 import com.reservation.ticket.concert.application.service.QueueService
+import com.reservation.ticket.concert.application.service.ReservationService
 import com.reservation.ticket.concert.domain.dto.ConcertDTO
 import com.reservation.ticket.concert.interfaces.request.BookingRequest
+import com.reservation.ticket.concert.interfaces.request.PayRequest
+import com.reservation.ticket.concert.interfaces.response.CommonResponse
 import com.reservation.ticket.concert.interfaces.response.ReservationResponse
 import io.swagger.v3.oas.annotations.Operation
 import org.springframework.web.bind.annotation.*
@@ -14,7 +17,7 @@ import java.util.UUID
 class ConcertController(
     private val concertService: ConcertService,
     private val bookingService: BookingFacade,
-    private val queueService: QueueService,
+    private val reservationService: ReservationService,
 ) {
 
     @Operation(summary = "예약 가능 날짜 조회", description = "예약 가능 날짜 조회 API")
@@ -38,6 +41,16 @@ class ConcertController(
         return ReservationResponse(
             code = "success",
             seat = seat
+        )
+    }
+
+    @Operation(summary = "결제 요청", description = "결제 요청 API")
+    @PostMapping("/pay")
+    fun confirmReservation(@RequestBody request: PayRequest, @RequestHeader token: UUID): CommonResponse {
+        val message = reservationService.confirmReservation(request.id)
+        return CommonResponse(
+            code = "success",
+            message = message,
         )
     }
 

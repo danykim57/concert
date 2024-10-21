@@ -14,7 +14,9 @@ import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.Mockito.*
 import org.mockito.MockitoAnnotations
+
 import org.mockito.kotlin.anyOrNull
+
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import java.time.LocalDateTime
 import java.util.*
@@ -61,6 +63,7 @@ class ReservationServiceTest {
     fun `should throw exception if reservation does not exist`() {
         // Given
         val reservationId = 1L
+
         `when`(reservationRepository.findById(anyOrNull())).thenReturn(Optional.empty())
 
         // When/Then
@@ -75,6 +78,7 @@ class ReservationServiceTest {
     fun `should throw exception if user does not exist`() {
         // Given
         val reservation = mockReservation()
+
         `when`(reservationRepository.findById(anyOrNull())).thenReturn(Optional.of(reservation))
         `when`(userRepository.findById(anyOrNull())).thenReturn(Optional.empty())
 
@@ -118,6 +122,7 @@ class ReservationServiceTest {
         val reservation = mockReservation()
         val user = mockUser(reservation.userId)
         val point = Point(user = user, amount = 50.0) // 부족한 포인트
+
         `when`(reservationRepository.findById(anyOrNull())).thenReturn(Optional.of(reservation))
         `when`(userRepository.findById(anyOrNull())).thenReturn(Optional.of(user))
         `when`(pointRepository.findByUserId(anyOrNull())).thenReturn(point)
@@ -136,6 +141,7 @@ class ReservationServiceTest {
         val reservation = mockReservation()
         val user = mockUser(reservation.userId)
         val point = Point(user = user, amount = 200.0) // 충분한 포인트
+
         `when`(reservationRepository.findById(anyOrNull())).thenReturn(Optional.of(reservation))
         `when`(userRepository.findById(anyOrNull())).thenReturn(Optional.of(user))
         `when`(pointRepository.findByUserId(anyOrNull())).thenReturn(point)
@@ -176,4 +182,5 @@ class ReservationServiceTest {
         concert = mockConcert(),
         token = UUID.randomUUID()
     )
+
 }
