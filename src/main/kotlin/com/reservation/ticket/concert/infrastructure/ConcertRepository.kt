@@ -3,7 +3,7 @@ package com.reservation.ticket.concert.infrastructure
 import com.reservation.ticket.concert.domain.Concert
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
-import java.util.*
+import java.util.Optional
 
 interface ConcertRepository : JpaRepository<Concert, Long> {
 

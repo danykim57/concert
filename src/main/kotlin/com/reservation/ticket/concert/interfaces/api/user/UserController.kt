@@ -5,8 +5,12 @@ import com.reservation.ticket.concert.application.service.UserService
 import com.reservation.ticket.concert.interfaces.request.PointRequest
 import com.reservation.ticket.concert.interfaces.response.PointResponse
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.*
-import java.util.*
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.PutMapping
+import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RestController
+import java.util.UUID
 
 @RestController(value = "api")
 class UserController(
@@ -15,10 +19,11 @@ class UserController(
 ) {
 
     @GetMapping("user/{userId}/point")
-    fun getMyPoint(@PathVariable userId: Long): PointResponse {
+    fun getMyPoint(@PathVariable userId: UUID): PointResponse {
+        val point = userService.get(userId)
         return PointResponse(
             code = "success",
-            point = 123.0
+            point = point
         )
     }
 
@@ -31,14 +36,25 @@ class UserController(
         )
     }
 
-    @PutMapping("user/{userId}/point")
+    @PutMapping("user/{userId}/point/add")
     fun addPoint(@PathVariable userId: Long, @RequestBody req: PointRequest): ResponseEntity<PointResponse> {
-        userService.add(req)
+        val point = userService.add(req)
         return ResponseEntity.ok(
             PointResponse(
-            code = "success",
-            point = 123.0,
+                code = "success",
+                point = point.amount,
+            )
         )
+    }
+
+    @PutMapping("user/{userId}/point/spend")
+    fun spendPoint(@PathVariable userId: Long, @RequestBody req: PointRequest): ResponseEntity<PointResponse> {
+        val point = userService.spend(req)
+        return ResponseEntity.ok(
+            PointResponse(
+                code = "success",
+                point = point.amount,
+            )
         )
     }
 
