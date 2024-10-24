@@ -19,7 +19,6 @@ import java.time.LocalDateTime
 class ReservationFacade (
     private val reservationService: ReservationService,
     private val userService: UserService,
-    private val queueStatusChecker: QueueStatusChecker,
     private val concertService: ConcertService,
     private val seatService: SeatService,
     private val queueService: QueueService,

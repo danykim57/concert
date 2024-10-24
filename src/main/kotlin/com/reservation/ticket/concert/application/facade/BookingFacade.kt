@@ -3,7 +3,6 @@ package com.reservation.ticket.concert.application.facade
 import com.reservation.ticket.concert.application.service.ConcertService
 import com.reservation.ticket.concert.application.service.ReservationService
 import com.reservation.ticket.concert.application.service.SeatService
-import com.reservation.ticket.concert.application.token.QueueStatusChecker
 import com.reservation.ticket.concert.domain.Reservation
 import com.reservation.ticket.concert.domain.ReservationStatus
 import com.reservation.ticket.concert.domain.dto.SeatDTO

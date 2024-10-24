@@ -25,7 +25,6 @@ class ReservationService(
     private val concertRepository: ConcertRepository,
     private val pointRepository: PointRepository,
     private val paymentRepository: PaymentRepository,
-    private val queueStatusChecker: QueueStatusChecker,
     private val queueRepository: QueueRepository,
 ) {
 
