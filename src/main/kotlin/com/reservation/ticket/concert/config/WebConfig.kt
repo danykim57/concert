@@ -11,7 +11,6 @@ class WebConfig(private val queueStatusInterceptor: QueueStatusInterceptor) : We
     override fun addInterceptors(registry: InterceptorRegistry) {
         // 모든 경로에 대해 인터셉터 적용
         registry.addInterceptor(queueStatusInterceptor)
-            .addPathPatterns("/api/token")
             .addPathPatterns("/api/concert/book")
             .addPathPatterns("/api/concert/pay")
     }
