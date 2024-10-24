@@ -1,6 +1,5 @@
 package com.reservation.ticket.concert.application.service
 
-import com.reservation.ticket.concert.application.token.QueueStatusChecker
 import com.reservation.ticket.concert.domain.Concert
 import com.reservation.ticket.concert.infrastructure.ConcertRepository
 import com.reservation.ticket.concert.infrastructure.exception.UnprocessableEntityException
@@ -10,7 +9,6 @@ import java.util.Optional
 @Service
 class ConcertService(
     private val concertRepository: ConcertRepository,
-    private val queueStatusChecker: QueueStatusChecker,
 ) {
     fun get(name: String): Concert = concertRepository.findByName(name)
         ?: throw UnprocessableEntityException("유효하지 않은 콘서트 입니다.")

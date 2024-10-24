@@ -54,7 +54,7 @@ class QueueService(
     }
 
     fun updateQueue(user: User, concert: Concert): Queue {
-        var originalQueue = queueRepository.findByUserIdAndConcert(user.id, concert)
+        val originalQueue = queueRepository.findByUserIdAndConcert(user.id, concert)
             ?: throw ForbiddenException("존재하지 않은 큐 입니다.")
 
         originalQueue.status = QueueStatus.PASS

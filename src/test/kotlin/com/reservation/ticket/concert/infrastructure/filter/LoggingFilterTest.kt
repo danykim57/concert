@@ -47,7 +47,7 @@ class LoggingFilterTest {
 
         loggingFilter.doFilterInternal(cachedRequest, cachedResponse, filterChain)
 
-        val requestBody = String(cachedRequest.contentAsByteArray!!)
+        val requestBody = String(cachedRequest.contentAsByteArray)
 
         assertEquals("""{"key": "value"}""", requestBody)
         assertEquals(200, response.status)

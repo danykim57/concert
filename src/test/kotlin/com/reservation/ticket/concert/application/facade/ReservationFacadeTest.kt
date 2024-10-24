@@ -24,13 +24,11 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.mockito.ArgumentMatchers.anyLong
-import org.mockito.Mockito.any
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.verify
 import org.mockito.Mockito.`when`
 import org.mockito.kotlin.anyOrNull
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.test.context.junit.jupiter.SpringExtension
 import java.time.LocalDateTime
 import java.util.Optional
 import java.util.UUID
@@ -112,7 +110,7 @@ class ReservationFacadeTest{
         `when`(reservationService.get(anyOrNull())).thenThrow(IllegalArgumentException("해당 예약이 존재하지 않습니다."))
 
         // When/Then
-        val exception = org.junit.jupiter.api.assertThrows<IllegalArgumentException> {
+        val exception = assertThrows<IllegalArgumentException> {
             reservationFacade.confirmReservation(reservationId)
         }
 
@@ -197,7 +195,6 @@ class ReservationFacadeTest{
         val point = Point(user = user, amount = 200.0) // 충분한 포인트
         val concert = Concert(id = 1L, name = "Concert", location = "Chicago", date = LocalDateTime.now(), availableTickets = 50 )
         val seat = Seat(id = 1L, price = 100.0, isAvailable = false, seatNumber = "A1", concert = concert)
-        val payment = Payment(id = 1L, user.id, reservation.id, seat.price, PaymentType.SPEND)
 
         `when`(reservationService.get(anyOrNull())).thenReturn(reservation)
         `when`(userService.getUserWithLock(anyOrNull())).thenReturn(user)
