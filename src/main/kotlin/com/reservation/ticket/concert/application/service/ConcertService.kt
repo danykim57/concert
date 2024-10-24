@@ -3,8 +3,9 @@ package com.reservation.ticket.concert.application.service
 import com.reservation.ticket.concert.application.token.QueueStatusChecker
 import com.reservation.ticket.concert.domain.Concert
 import com.reservation.ticket.concert.infrastructure.ConcertRepository
+import com.reservation.ticket.concert.infrastructure.exception.UnprocessableEntityException
 import org.springframework.stereotype.Service
-import java.util.*
+import java.util.Optional
 
 @Service
 class ConcertService(
@@ -12,7 +13,7 @@ class ConcertService(
     private val queueStatusChecker: QueueStatusChecker,
 ) {
     fun get(name: String): Concert = concertRepository.findByName(name)
-        ?: throw IllegalArgumentException("유효하지 않은 콘서트 입니다.")
+        ?: throw UnprocessableEntityException("유효하지 않은 콘서트 입니다.")
 
     fun get(id: Long): Optional<Concert> = concertRepository.findById(id)
 

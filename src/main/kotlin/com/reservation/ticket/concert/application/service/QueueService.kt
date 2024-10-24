@@ -5,20 +5,23 @@ import com.reservation.ticket.concert.domain.Queue
 import com.reservation.ticket.concert.domain.QueueStatus
 import com.reservation.ticket.concert.domain.User
 import com.reservation.ticket.concert.infrastructure.QueueRepository
+import com.reservation.ticket.concert.infrastructure.exception.ForbiddenException
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.util.*
+import java.util.UUID
 
 @Service
 class QueueService(
     private val queueRepository: QueueRepository
 ) {
+    fun get(userId: UUID): Queue {
+        return queueRepository.findByUserId(userId) ?: throw IllegalArgumentException("존재하지 않는 대기열 토큰 입니다.")
+    }
 
     // 유저의 대기 순번을 조회하는 메서드
     fun getUserQueuePosition(userId: UUID): Int {
         // 유저가 대기열에 있는지 확인
-        val userQueue = queueRepository.findByUserId(userId)
-            ?: throw IllegalArgumentException("해당 유저는 대기열에 없습니다.")
+        val userQueue = get(userId)
 
         // 모든 대기열을 시간순으로 조회
         val allQueues = queueRepository.findAllByOrderByCreatedAtAsc()
@@ -52,14 +55,14 @@ class QueueService(
 
     fun updateQueue(user: User, concert: Concert): Queue {
         var originalQueue = queueRepository.findByUserIdAndConcert(user.id, concert)
-            ?: throw IllegalArgumentException("존재하지 않은 큐 입니다.")
+            ?: throw ForbiddenException("존재하지 않은 큐 입니다.")
 
         originalQueue.status = QueueStatus.PASS
 
         return queueRepository.save(originalQueue)
     }
 
-    fun isValidToken(token: String): Boolean {
-        return token.isNotEmpty()
+    fun delete(queue: Queue) {
+        return queueRepository.delete(queue)
     }
 }

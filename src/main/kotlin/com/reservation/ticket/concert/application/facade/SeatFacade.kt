@@ -3,10 +3,10 @@ package com.reservation.ticket.concert.application.facade
 import com.reservation.ticket.concert.application.service.SeatService
 import com.reservation.ticket.concert.application.token.QueueStatusChecker
 import com.reservation.ticket.concert.domain.Seat
-import com.reservation.ticket.concert.infrastructure.SeatRepository
+import com.reservation.ticket.concert.infrastructure.exception.UnprocessableEntityException
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
-import java.util.*
+import java.util.UUID
 
 @Service
 class SeatFacade (
@@ -16,7 +16,7 @@ class SeatFacade (
 
     fun getAvailableSeats(date:LocalDateTime, userId: UUID): List<Seat>{
         if (queueStatusChecker.isQueueStatusPass(userId) == false)
-            throw IllegalArgumentException("아직 대기중입니다.")
+            throw UnprocessableEntityException("아직 대기중입니다.")
         return seatService.getAvailableSeats(date)
     }
 
