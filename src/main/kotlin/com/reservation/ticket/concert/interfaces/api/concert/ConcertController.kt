@@ -9,6 +9,8 @@ import com.reservation.ticket.concert.interfaces.request.PayRequest
 import com.reservation.ticket.concert.interfaces.response.CommonResponse
 import com.reservation.ticket.concert.interfaces.response.ReservationResponse
 import io.swagger.v3.oas.annotations.Operation
+import org.springframework.http.HttpStatus
+import org.springframework.http.HttpStatusCode
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -42,6 +44,7 @@ class ConcertController(
     fun bookSeat(@RequestBody request: BookingRequest, @RequestHeader token: UUID): ReservationResponse {
         val seat = bookingService.book(request, token)
         return ReservationResponse(
+            status = HttpStatus.OK.value(),
             code = "success",
             seat = seat
         )
@@ -52,6 +55,7 @@ class ConcertController(
     fun confirmReservation(@RequestBody request: PayRequest, @RequestHeader token: UUID): CommonResponse {
         val message = reservationService.confirmReservation(request.id)
         return CommonResponse(
+            status = HttpStatus.OK.value(),
             code = "success",
             message = message,
         )

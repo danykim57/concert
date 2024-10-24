@@ -4,6 +4,7 @@ import com.reservation.ticket.concert.application.service.QueueService
 import com.reservation.ticket.concert.application.service.UserService
 import com.reservation.ticket.concert.interfaces.request.PointRequest
 import com.reservation.ticket.concert.interfaces.response.PointResponse
+import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -22,7 +23,8 @@ class UserController(
     fun getMyPoint(@PathVariable userId: UUID): PointResponse {
         val point = userService.get(userId)
         return PointResponse(
-            code = "success",
+            status = HttpStatus.OK.value(),
+            code = HttpStatus.OK.reasonPhrase,
             point = point
         )
     }
@@ -31,7 +33,8 @@ class UserController(
     fun getUserPoints(@PathVariable userId: UUID): PointResponse {
         val point = userService.get(userId)
         return PointResponse(
-            code = "success",
+            status = HttpStatus.OK.value(),
+            code = HttpStatus.OK.reasonPhrase,
             point = point
         )
     }
@@ -41,7 +44,8 @@ class UserController(
         val point = userService.add(req)
         return ResponseEntity.ok(
             PointResponse(
-                code = "success",
+                status = HttpStatus.OK.value(),
+                code = HttpStatus.OK.reasonPhrase,
                 point = point.amount,
             )
         )
@@ -52,7 +56,8 @@ class UserController(
         val point = userService.spend(req)
         return ResponseEntity.ok(
             PointResponse(
-                code = "success",
+                status = HttpStatus.OK.value(),
+                code = HttpStatus.OK.reasonPhrase,
                 point = point.amount,
             )
         )
