@@ -29,6 +29,12 @@ class ReservationService(
     private val queueRepository: QueueRepository,
 ) {
 
+    fun get(id: Long): Reservation {
+        return reservationRepository.findById(id).orElseThrow {
+            throw IllegalArgumentException("해당 예약이 존재하지 않습니다.")
+        }
+    }
+
     fun save(reservation: Reservation): Reservation {
         return reservationRepository.save(reservation)
     }
@@ -50,11 +56,11 @@ class ReservationService(
             throw IllegalArgumentException("유효하지 않은 토큰 입니다.")
         }
 
-        val concert = concertRepository.findById(reservation.concert.id).orElseThrow {
+        concertRepository.findById(reservation.concert.id).orElseThrow {
             throw IllegalArgumentException("콘서트가 존재하지 않습니다.")
         }
 
-        val seat = seatRepository.findById(reservation.seat.id).orElseThrow{
+        val seat = seatRepository.findWriteLockById(reservation.seat.id).orElseThrow{
             throw IllegalArgumentException("존재하지 않은 좌석 입니다.")
         }
 

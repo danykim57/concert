@@ -34,7 +34,7 @@ class ReservationFacade (
         val reservation = reservationService.get(reservationId)
 
         // 비관락이 들어감
-        val user = userService.getUserWithLock(reservation.userId);
+        val user = userService.getUserWithLock(reservation.userId)
 
         if (!queueStatusChecker.isQueueStatusPass(user.id)) {
             throw IllegalArgumentException("유효하지 않은 토큰 입니다.")
