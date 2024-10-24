@@ -12,5 +12,7 @@ interface UserRepository : JpaRepository<User, UUID> {
     fun findByUsernameAndPassword(username: String, password: String): User?
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
+    fun findWriteLockById(id: UUID): User?
+
     override fun findById(id: UUID): Optional<User>
 }

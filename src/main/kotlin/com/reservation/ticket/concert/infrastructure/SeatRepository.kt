@@ -12,8 +12,11 @@ interface SeatRepository : JpaRepository<Seat, Long> {
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     fun findByConcertDateBetween(startDate: LocalDateTime, endDate: LocalDateTime): List<Seat>
 
-    @Lock(LockModeType.PESSIMISTIC_WRITE)
     override fun findById(id: Long): Optional<Seat>
 
+
     fun save(seat: Seat): Seat
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    fun findWriteLockById(seatId: Long): Optional<Seat>
 }
