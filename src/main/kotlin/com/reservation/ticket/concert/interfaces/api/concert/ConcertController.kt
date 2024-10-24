@@ -1,8 +1,8 @@
 package com.reservation.ticket.concert.interfaces.api.concert
 
 import com.reservation.ticket.concert.application.facade.BookingFacade
+import com.reservation.ticket.concert.application.facade.ReservationFacade
 import com.reservation.ticket.concert.application.service.ConcertService
-import com.reservation.ticket.concert.application.service.ReservationService
 import com.reservation.ticket.concert.domain.dto.ConcertDTO
 import com.reservation.ticket.concert.interfaces.request.BookingRequest
 import com.reservation.ticket.concert.interfaces.request.PayRequest
@@ -10,7 +10,6 @@ import com.reservation.ticket.concert.interfaces.response.CommonResponse
 import com.reservation.ticket.concert.interfaces.response.ReservationResponse
 import io.swagger.v3.oas.annotations.Operation
 import org.springframework.http.HttpStatus
-import org.springframework.http.HttpStatusCode
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -22,7 +21,7 @@ import java.util.UUID
 class ConcertController(
     private val concertService: ConcertService,
     private val bookingService: BookingFacade,
-    private val reservationService: ReservationService,
+    private val reservationFacade: ReservationFacade,
 ) {
 
     @Operation(summary = "예약 가능 날짜 조회", description = "예약 가능 날짜 조회 API")
@@ -53,7 +52,7 @@ class ConcertController(
     @Operation(summary = "결제 요청", description = "결제 요청 API")
     @PostMapping("/pay")
     fun confirmReservation(@RequestBody request: PayRequest, @RequestHeader token: UUID): CommonResponse {
-        val message = reservationService.confirmReservation(request.id)
+        val message = reservationFacade.confirmReservation(request.id)
         return CommonResponse(
             status = HttpStatus.OK.value(),
             code = "success",
