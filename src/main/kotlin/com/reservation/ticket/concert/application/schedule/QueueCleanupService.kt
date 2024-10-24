@@ -2,6 +2,7 @@ package com.reservation.ticket.concert.application.schedule
 
 import com.reservation.ticket.concert.domain.QueueStatus
 import com.reservation.ticket.concert.infrastructure.QueueRepository
+import org.slf4j.LoggerFactory
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -9,8 +10,13 @@ import java.time.LocalDateTime
 
 @Service
 class QueueCleanupService(
-    private val queueRepository: QueueRepository
+    private val queueRepository: QueueRepository,
 ) {
+
+    companion object {
+        private val logger = LoggerFactory.getLogger(QueueCleanupService::class.java)
+    }
+
 
     @Scheduled(fixedRate = 60000)  // 1분마다 실행
     @Transactional
@@ -26,7 +32,7 @@ class QueueCleanupService(
         // 해당하는 큐들을 삭제
         if (expiredQueues.isNotEmpty()) {
             queueRepository.deleteAll(expiredQueues)
-            println("Deleted ${expiredQueues.size} expired queues")
+            logger.info("Deleted ${expiredQueues.size} expired queues")
         }
     }
 }
