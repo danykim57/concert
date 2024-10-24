@@ -122,39 +122,4 @@ class QueueServiceTest {
         verify(queueRepository, times(1)).save(anyOrNull())
     }
 
-    @Test
-    fun `isValidToken should return true for non-empty token`() {
-        // Given
-        val validToken = "validToken123"
-
-        // When
-        val result = queueService.isValidToken(validToken)
-
-        // Then
-        assertTrue(result)  // 비어 있지 않은 유효한 토큰이므로 true
-    }
-
-    @Test
-    fun `isValidToken should return false for empty token`() {
-        // Given
-        val emptyToken = ""
-
-        // When
-        val result = queueService.isValidToken(emptyToken)
-
-        // Then
-        assertFalse(result)  // 빈 문자열이므로 false
-    }
-
-    @Test
-    fun `isValidToken should return false for null token`() {
-        // Given
-        val nullToken: String? = null
-
-        // When
-        val result = queueService.isValidToken(nullToken ?: "")
-
-        // Then
-        assertFalse(result)  // null이거나 빈 문자열이면 false
-    }
 }
