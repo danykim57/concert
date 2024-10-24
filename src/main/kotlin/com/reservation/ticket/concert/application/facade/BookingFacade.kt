@@ -17,14 +17,12 @@ import java.util.*
 @Service
 class BookingFacade(
     private val seatService: SeatService,
-    private val queueStatusChecker: QueueStatusChecker,
     private val concertService: ConcertService,
     private val reservationService: ReservationService
 ) {
 
     @Transactional
     fun book(request: BookingRequest, userId: UUID): SeatDTO {
-        queueStatusChecker.checkTokenValid(request.queueToken, userId)
 
         val concert = concertService.get(request.concertId)
         if (concert.isEmpty)

@@ -52,10 +52,6 @@ class ReservationService(
             throw IllegalArgumentException("해당 유저를 찾을 수 없습니다.")
         }
 
-        if (queueStatusChecker.isQueueStatusPass(user.id)) {
-            throw IllegalArgumentException("유효하지 않은 토큰 입니다.")
-        }
-
         concertRepository.findById(reservation.concert.id).orElseThrow {
             throw IllegalArgumentException("콘서트가 존재하지 않습니다.")
         }
