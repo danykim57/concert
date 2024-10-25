@@ -31,7 +31,7 @@ class GlobalExceptionHandler {
 
     @ExceptionHandler(UnprocessableEntityException::class)
     fun handleCustomException(ex: UnprocessableEntityException): CommonResponse {
-        logger.error(ex.message, ex)
+        logger.warn(ex.message, ex)
 
         return CommonResponse(
             status = HttpStatus.UNPROCESSABLE_ENTITY.value(),
@@ -42,7 +42,7 @@ class GlobalExceptionHandler {
 
     @ExceptionHandler(IllegalArgumentException::class)
     fun handleCustomException(ex: IllegalArgumentException): CommonResponse {
-        logger.error(ex.message, ex)
+        logger.warn(ex.message, ex)
 
         return CommonResponse(
             status = HttpStatus.BAD_REQUEST.value(),
@@ -53,7 +53,7 @@ class GlobalExceptionHandler {
 
     @ExceptionHandler(BadRequest::class)
     fun handleCustomException(ex: BadRequest): CommonResponse {
-        logger.error(ex.message, ex)
+        logger.warn(ex.message, ex)
 
         return CommonResponse(
             status = HttpStatus.BAD_REQUEST.value(),
@@ -64,7 +64,7 @@ class GlobalExceptionHandler {
 
     @ExceptionHandler(Forbidden::class)
     fun handleCustomException(ex: Forbidden): CommonResponse {
-        logger.error(ex.message, ex)
+        logger.warn(ex.message, ex)
 
         return CommonResponse(
             status = HttpStatus.FORBIDDEN.value(),
