@@ -2,11 +2,12 @@ package com.reservation.ticket.concert.domain
 
 import org.springframework.http.HttpStatus
 
-enum class ErrorCode(statusCode: HttpStatus, val message: String) {
+enum class ErrorCode(val statusCode: HttpStatus, val message: String) {
     HTTP_MESSAGE_NOT_READABLE(HttpStatus.BAD_REQUEST, "유효하지 않은 타입이거나 요청 값이 누락되었습니다."),
     MISSING_TOKEN(HttpStatus.UNAUTHORIZED, "토큰 값이 존재하지 않습니다."),
 
     // Business Error
+    FORBIDDEN(HttpStatus.FORBIDDEN, "승인되지 않은 접근 입니다."),
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 사용자입니다."),
     UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "토큰 인증에 실패하였습니다."),
     BEFORE_RESERVATION_AT(HttpStatus.BAD_REQUEST, "예약하기에는 이릅니다."),
