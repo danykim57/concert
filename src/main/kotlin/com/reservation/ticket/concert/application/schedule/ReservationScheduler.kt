@@ -4,6 +4,7 @@ import com.reservation.ticket.concert.domain.ReservationStatus
 import com.reservation.ticket.concert.infrastructure.QueueRepository
 import com.reservation.ticket.concert.infrastructure.ReservationRepository
 import com.reservation.ticket.concert.infrastructure.SeatRepository
+import org.slf4j.LoggerFactory
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -15,6 +16,10 @@ class ReservationScheduler(
     private val queueRepository: QueueRepository,
     private val seatRepository: SeatRepository
 ) {
+
+    companion object {
+        private val logger = LoggerFactory.getLogger(QueueCleanupService::class.java)
+    }
 
     @Scheduled(fixedRate = 60000)  // 1분마다 실행
     @Transactional
@@ -41,7 +46,7 @@ class ReservationScheduler(
             reservation.status = ReservationStatus.CANCELLED
             reservationRepository.save(reservation)
 
-            println("Reservation for seat ${seat.seatNumber} has been cancelled due to non-payment.")
+            logger.info("Reservation for seat ${seat.seatNumber} has been cancelled due to non-payment.")
         }
     }
 }
