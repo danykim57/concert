@@ -7,12 +7,12 @@ import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.ResponseStatus
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.RestControllerAdvice
 import org.springframework.web.client.HttpClientErrorException.BadRequest
 import org.springframework.web.client.HttpClientErrorException.Forbidden
 
 
-@RestController
+@RestControllerAdvice
 class GlobalExceptionHandler {
 
     val logger: Logger = LoggerFactory.getLogger(GlobalExceptionHandler::class.java)
