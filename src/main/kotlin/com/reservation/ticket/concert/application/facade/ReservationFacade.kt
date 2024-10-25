@@ -10,6 +10,7 @@ import com.reservation.ticket.concert.application.service.UserService
 import com.reservation.ticket.concert.application.token.QueueStatusChecker
 import com.reservation.ticket.concert.domain.Payment
 import com.reservation.ticket.concert.domain.PaymentType
+import com.reservation.ticket.concert.domain.ReservationMessage
 import com.reservation.ticket.concert.domain.ReservationStatus
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -87,6 +88,6 @@ class ReservationFacade (
         //대기열 삭제
         queueService.delete(queue)
 
-        return "예약이 결제 완료 처리되었습니다."
+        return ReservationMessage.CONFIRM.message
     }
 }
