@@ -25,7 +25,7 @@ class ConcertControllerConcurrencyTest {
     private lateinit var mockMvc: MockMvc
 
     @Test
-    fun `multiple users send requests to get available concerts`() {
+    fun `multiple users send requests to get available concerts and all gets the result`() {
         val numberOfThreads = 10
         val executorService: ExecutorService = Executors.newFixedThreadPool(numberOfThreads)
         val latch = CountDownLatch(numberOfThreads)
@@ -60,33 +60,35 @@ class ConcertControllerConcurrencyTest {
     }
 
     @Test
-    fun `multiple users send requests to book the concert`() {
+    fun `multiple users send requests to book the same concert seat but only one booking succeeds`() {
 
         val numberOfThreads = 10
         val executorService: ExecutorService = Executors.newFixedThreadPool(numberOfThreads)
         val latch = CountDownLatch(numberOfThreads)
 
-        val token = UUID.randomUUID()
+        val concertId = "concert123"
+        val seatId = "A1"
 
         val request = """
-            {
-                "concertId": "concert123",
-                "seatId": "A1"
-            }
-        """.trimIndent()
+        {
+            "concertId": "$concertId",
+            "seatId": "$seatId"
+        }
+    """.trimIndent()
 
-        // 응답 저장용 리스트
         val responses = mutableListOf<String>()
 
-        // 10명의 사용자로부터 동시 예약 요청을 보냄
         for (i in 0 until numberOfThreads) {
             executorService.submit {
                 try {
-                    // 좌석 예약 요청
+                    // Each user has a unique token
+                    val token = UUID.randomUUID()
+
+                    // Send booking request
                     val response = mockMvc.post("/api/concert/book") {
                         contentType = MediaType.APPLICATION_JSON
                         content = request
-                        header("token", token)
+                        header("token", token.toString())
                     }.andExpect { status { isOk() } }
                         .andReturn().response.contentAsString
 
@@ -94,35 +96,36 @@ class ConcertControllerConcurrencyTest {
                         responses.add(response)
                     }
                 } finally {
-                    latch.countDown()  // 스레드 작업 완료 알림
+                    latch.countDown()
                 }
             }
         }
 
-        // 모든 스레드가 작업을 마칠 때까지 대기
         latch.await()
 
-        // 응답 결과 확인
         assertThat(responses.size).isEqualTo(numberOfThreads)
 
         val successResponses = responses.filter { it.contains("\"code\":\"success\"") }
         val failureResponses = responses.filter { it.contains("\"code\":\"failure\"") }
 
         assertThat(successResponses.size).isEqualTo(1)
+
         assertThat(failureResponses.size).isEqualTo(numberOfThreads - 1)
     }
 
+
     @Test
-    fun `multiple users send payment requests simultaneously`() {
+    fun `same user sends multiple simultaneous payment requests but only one should succeed`() {
         val numberOfThreads = 10
         val executorService: ExecutorService = Executors.newFixedThreadPool(numberOfThreads)
         val latch = CountDownLatch(numberOfThreads)
 
         val token = UUID.randomUUID()
+        val reservationId = "reservation-id-123"
 
         val request = """
             {
-                "id": "reservation-id-123"
+                "id": "$reservationId"
             }
         """.trimIndent()
 
@@ -136,8 +139,6 @@ class ConcertControllerConcurrencyTest {
                         contentType = MediaType.APPLICATION_JSON
                         content = request
                         header("token", token.toString())
-                    }.andExpect {
-                        status { isOk() }
                     }.andReturn().response.contentAsString
 
                     synchronized(responses) {
@@ -153,9 +154,16 @@ class ConcertControllerConcurrencyTest {
 
         assertThat(responses.size).isEqualTo(numberOfThreads)
 
-        val firstResponse = responses.first()
-        responses.forEach { response ->
-            assertThat(response).isEqualTo(firstResponse)
+        val successResponses = responses.filter { response ->
+            response.contains("\"code\":\"success\"")
         }
+
+        assertThat(successResponses.size).isEqualTo(1)
+
+        val failureResponses = responses.filter { response ->
+            response.contains("\"code\":\"failure\"") || response.contains("\"code\":\"duplicate\"")
+        }
+
+        assertThat(failureResponses.size).isEqualTo(numberOfThreads - 1)
     }
 }

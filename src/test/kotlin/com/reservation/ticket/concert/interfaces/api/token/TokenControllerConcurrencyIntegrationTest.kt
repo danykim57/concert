@@ -53,13 +53,11 @@ class TokenConcurrencyTest {
     }
 
     @Test
-    @Transactional
-    fun `execute multiple token generations at once`() {
+    fun `execute multiple token generations at once and ensure all users get tokens`() {
 
         val numberOfThreads = 10
         val executorService: ExecutorService = Executors.newFixedThreadPool(numberOfThreads)
         val latch = CountDownLatch(numberOfThreads)
-
 
         val responses = mutableListOf<TokenResponse>()
 
@@ -67,9 +65,14 @@ class TokenConcurrencyTest {
             val user = users[i]
             executorService.submit {
                 try {
+                    val req = TokenRequest(
+                        id = user.username,
+                        password = "password${i + 1}",
+                        concertCode = concert.id.toString()
+                    )
 
-                    val req = TokenRequest(id = user.username, password = "password${i + 1}", concertCode = concert.id.toString())
                     val response = tokenController.getToken(req)
+
                     synchronized(responses) {
                         responses.add(response)
                     }
@@ -80,11 +83,15 @@ class TokenConcurrencyTest {
         }
 
         latch.await()
-        val waitingResponses = responses.filter { it.status == HttpStatus.OK.value() }
-        val distinctTokens = waitingResponses.map { it.token }.distinct()
 
+        val successResponses = responses.filter { it.status == HttpStatus.OK.value() }
+
+        val distinctTokens = successResponses.map { it.token }.distinct()
+
+        // Assertions
         assertThat(responses.size).isEqualTo(numberOfThreads)
-        assertThat(waitingResponses.size).isEqualTo(numberOfThreads)
-        assertThat(distinctTokens.size).isEqualTo(1)
+        assertThat(successResponses.size).isEqualTo(numberOfThreads)
+        assertThat(distinctTokens.size).isEqualTo(numberOfThreads)
     }
+
 }
