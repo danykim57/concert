@@ -31,6 +31,10 @@ class UserService(
         }
     }
 
+    fun saveUser(user: User): User {
+        return userRepository.save(user)
+    }
+
     fun getUserWithLock(userId: UUID): User {
          val user = userRepository.findWriteLockById(userId)
             ?: throw IllegalArgumentException("해당 유저를 찾을 수 없습니다.")
