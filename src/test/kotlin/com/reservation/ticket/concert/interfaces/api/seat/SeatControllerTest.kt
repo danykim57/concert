@@ -17,7 +17,7 @@ import java.util.concurrent.Executors
 @ExtendWith(SpringExtension::class)
 @SpringBootTest
 @AutoConfigureMockMvc
-class SeatControllerConcurrencyTest {
+class SeatControllerTest {
 
     @Autowired
     private lateinit var mockMvc: MockMvc

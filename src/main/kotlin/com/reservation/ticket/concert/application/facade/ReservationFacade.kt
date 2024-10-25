@@ -7,7 +7,6 @@ import com.reservation.ticket.concert.application.service.QueueService
 import com.reservation.ticket.concert.application.service.ReservationService
 import com.reservation.ticket.concert.application.service.SeatService
 import com.reservation.ticket.concert.application.service.UserService
-import com.reservation.ticket.concert.application.token.QueueStatusChecker
 import com.reservation.ticket.concert.domain.Payment
 import com.reservation.ticket.concert.domain.PaymentType
 import com.reservation.ticket.concert.domain.ReservationStatus
