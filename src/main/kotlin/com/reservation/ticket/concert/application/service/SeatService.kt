@@ -32,6 +32,7 @@ class SeatService(private val seatRepository: SeatRepository) {
         return seatRepository.save(seat)
     }
 
+    //TODO: 좌석 예약 함 동시성
     fun save(seatId: Long): Seat {
         val seat = getWithLock(seatId)
             ?: throw UnprocessableEntityException("해당 좌석이 존재하지 않습니다.")

@@ -41,6 +41,7 @@ class UserService(
          return user
     }
 
+    //TODO 유저 포인트 가져오기
     fun getPoint(userId: UUID): Point {
         return pointRepository.findByUserId(userId) ?: throw IllegalArgumentException("해당 유저의 포인트 정보가 존재하지 않습니다.")
     }
