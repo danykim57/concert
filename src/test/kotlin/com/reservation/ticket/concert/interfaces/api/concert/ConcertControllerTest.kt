@@ -1,9 +1,5 @@
-package com.reservation.ticket.concert.interfaces.api.user
+package com.reservation.ticket.concert.interfaces.api.concert
 
-import com.reservation.ticket.concert.application.service.QueueService
-import com.reservation.ticket.concert.application.service.UserService
-import com.reservation.ticket.concert.domain.Concert
-import com.reservation.ticket.concert.domain.User
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -14,8 +10,7 @@ import org.springframework.http.MediaType
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.get
-import org.springframework.test.web.servlet.put
-import java.time.LocalDateTime
+import org.springframework.test.web.servlet.post
 import java.util.UUID
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.ExecutorService
@@ -24,80 +19,26 @@ import java.util.concurrent.Executors
 @ExtendWith(SpringExtension::class)
 @SpringBootTest
 @AutoConfigureMockMvc
-class UserControllerTest {
+class ConcertControllerTest {
 
     @Autowired
     private lateinit var mockMvc: MockMvc
 
-    @Autowired
-    private lateinit var queueService: QueueService
-
-    @Autowired
-    private lateinit var userService: UserService
-
     @Test
-    fun `multiple users send requests to get their queue position`() {
-
+    fun `multiple users send requests to get available concerts and all gets the result`() {
         val numberOfThreads = 10
         val executorService: ExecutorService = Executors.newFixedThreadPool(numberOfThreads)
         val latch = CountDownLatch(numberOfThreads)
 
-        val tempConcert = Concert(name = "Concert 1", location = "lollapalooza", date = LocalDateTime.now(), availableTickets = 48)
-        val users = (1..10).map {
-            userService.saveUser(User(UUID.randomUUID(),"testUser$it", "password$it"))
-        }
-
-        val userIds = users.map { it -> it.id }
-        val expectedPositions = (1..numberOfThreads).toList()
-
         val responses = mutableListOf<String>()
 
         for (i in 0 until numberOfThreads) {
-            val userId = userIds[i]
             executorService.submit {
                 try {
-                    val response = mockMvc.get("/api/$userId/position")
+                    // 예약 가능 날짜 조회 요청
+                    val response = mockMvc.get("/api/concert/concerts/available")
                         .andExpect { status { isOk() } }
                         .andReturn().response.contentAsString
-
-                    synchronized(responses) {
-                        responses.add(response)
-                    }
-                } finally {
-                    latch.countDown()
-                }
-            }
-        }
-
-        latch.await()
-
-        assertThat(responses.size).isEqualTo(numberOfThreads)
-
-        expectedPositions.forEach { position ->
-            assertThat(responses).contains(position.toString())
-        }
-    }
-
-    @Test
-    fun `multiple users send their own point GET requests`() {
-
-        val numberOfThreads = 10
-        val executorService: ExecutorService = Executors.newFixedThreadPool(numberOfThreads)
-        val latch = CountDownLatch(numberOfThreads)
-
-        val userId = UUID.randomUUID()
-
-        val responses = mutableListOf<String>()
-
-        for (i in 0 until numberOfThreads) {
-            executorService.submit {
-                try {
-                    // 포인트 조회 요청
-                    val response = mockMvc.get("/api/user/$userId/point") {
-                        accept(MediaType.APPLICATION_JSON)
-                    }.andExpect {
-                        status { isOk() }
-                    }.andReturn().response.contentAsString
 
                     synchronized(responses) {
                         responses.add(response)
@@ -117,18 +58,74 @@ class UserControllerTest {
             assertThat(response).isEqualTo(firstResponse)
         }
     }
+
     @Test
-    fun `multiple users send 'add points' requests at once`() {
+    fun `multiple users send requests to book the same concert seat but only one booking succeeds`() {
 
         val numberOfThreads = 10
         val executorService: ExecutorService = Executors.newFixedThreadPool(numberOfThreads)
         val latch = CountDownLatch(numberOfThreads)
 
-        val userId = 1L
+        val concertId = "concert123"
+        val seatId = "A1"
+
+        val request = """
+        {
+            "concertId": "$concertId",
+            "seatId": "$seatId"
+        }
+    """.trimIndent()
+
+        val responses = mutableListOf<String>()
+
+        for (i in 0 until numberOfThreads) {
+            executorService.submit {
+                try {
+                    // Each user has a unique token
+                    val token = UUID.randomUUID()
+
+                    // Send booking request
+                    val response = mockMvc.post("/api/concert/book") {
+                        contentType = MediaType.APPLICATION_JSON
+                        content = request
+                        header("token", token.toString())
+                    }.andExpect { status { isOk() } }
+                        .andReturn().response.contentAsString
+
+                    synchronized(responses) {
+                        responses.add(response)
+                    }
+                } finally {
+                    latch.countDown()
+                }
+            }
+        }
+
+        latch.await()
+
+        assertThat(responses.size).isEqualTo(numberOfThreads)
+
+        val successResponses = responses.filter { it.contains("\"code\":\"success\"") }
+        val failureResponses = responses.filter { it.contains("\"code\":\"failure\"") }
+
+        assertThat(successResponses.size).isEqualTo(1)
+
+        assertThat(failureResponses.size).isEqualTo(numberOfThreads - 1)
+    }
+
+
+    @Test
+    fun `same user sends multiple simultaneous payment requests but only one should succeed`() {
+        val numberOfThreads = 10
+        val executorService: ExecutorService = Executors.newFixedThreadPool(numberOfThreads)
+        val latch = CountDownLatch(numberOfThreads)
+
+        val token = UUID.randomUUID()
+        val reservationId = "reservation-id-123"
 
         val request = """
             {
-                "amount": 100
+                "id": "$reservationId"
             }
         """.trimIndent()
 
@@ -137,12 +134,11 @@ class UserControllerTest {
         for (i in 0 until numberOfThreads) {
             executorService.submit {
                 try {
-                    // 포인트 추가 요청
-                    val response = mockMvc.put("/api/user/$userId/point/add") {
+                    // Payment request
+                    val response = mockMvc.post("/api/concert/pay") {
                         contentType = MediaType.APPLICATION_JSON
                         content = request
-                    }.andExpect {
-                        status { isOk() }
+                        header("token", token.toString())
                     }.andReturn().response.contentAsString
 
                     synchronized(responses) {
@@ -158,10 +154,16 @@ class UserControllerTest {
 
         assertThat(responses.size).isEqualTo(numberOfThreads)
 
-        responses.forEach { response ->
-            assertThat(response).contains("\"code\":\"OK\"")
-            assertThat(response).contains("\"point\":100")
+        val successResponses = responses.filter { response ->
+            response.contains("\"code\":\"success\"")
         }
-    }
 
+        assertThat(successResponses.size).isEqualTo(1)
+
+        val failureResponses = responses.filter { response ->
+            response.contains("\"code\":\"failure\"") || response.contains("\"code\":\"duplicate\"")
+        }
+
+        assertThat(failureResponses.size).isEqualTo(numberOfThreads - 1)
+    }
 }

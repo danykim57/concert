@@ -7,7 +7,6 @@ import com.reservation.ticket.concert.application.service.QueueService
 import com.reservation.ticket.concert.application.service.ReservationService
 import com.reservation.ticket.concert.application.service.SeatService
 import com.reservation.ticket.concert.application.service.UserService
-import com.reservation.ticket.concert.application.token.QueueStatusChecker
 import com.reservation.ticket.concert.domain.Concert
 import com.reservation.ticket.concert.domain.Point
 import com.reservation.ticket.concert.domain.Queue
@@ -40,7 +39,6 @@ class ReservationFacadeTest{
     private lateinit var reservationFacade: ReservationFacade
     private lateinit var reservationService: ReservationService
     private lateinit var userService: UserService
-    private lateinit var queueStatusChecker: QueueStatusChecker
     private lateinit var concertService: ConcertService
     private lateinit var seatService: SeatService
     private lateinit var queueService: QueueService
@@ -51,7 +49,6 @@ class ReservationFacadeTest{
     fun setUp() {
         reservationService = mock(ReservationService::class.java)
         userService = mock(UserService::class.java)
-        queueStatusChecker = mock(QueueStatusChecker::class.java)
         concertService = mock(ConcertService::class.java)
         seatService = mock(SeatService::class.java)
         queueService = mock(QueueService::class.java)
@@ -62,7 +59,6 @@ class ReservationFacadeTest{
         reservationFacade = ReservationFacade(
             reservationService,
             userService,
-            queueStatusChecker,
             concertService,
             seatService,
             queueService,
@@ -90,7 +86,6 @@ class ReservationFacadeTest{
         `when`(reservationService.get(reservationId)).thenReturn(reservation)
         `when`(userService.getUserWithLock(reservation.userId)).thenReturn(user)
         `when`(seatService.get(reservation.seat.id)).thenReturn(seat)
-        `when`(queueStatusChecker.isQueueStatusPass(user.id)).thenReturn(false)  // 토큰 유효하지 않음
 
         // When / Then
         val exception = assertFailsWith<IllegalArgumentException> {
@@ -146,7 +141,7 @@ class ReservationFacadeTest{
         `when`(concertService.get(anyLong())).thenReturn(Optional.of(reservation.concert))
         `when`(seatService.get(anyOrNull())).thenReturn(seat)
         `when`(queueService.get(anyOrNull())).thenReturn(queue)
-        `when`(queueStatusChecker.isQueueStatusPass(user.id)).thenReturn(true)
+
         `when`(userService.getPoint(user.id)).thenReturn(point)
 
         // When/Then
@@ -174,7 +169,7 @@ class ReservationFacadeTest{
         `when`(reservationService.get(anyOrNull())).thenReturn(reservation)
         `when`(userService.getUserWithLock(anyOrNull())).thenReturn(user)
         `when`(userService.getPoint(anyOrNull())).thenReturn(point)
-        `when`(queueStatusChecker.isQueueStatusPass(user.id)).thenReturn(true)
+
         `when`(seatService.get(anyOrNull())).thenReturn(seat)
 
         // When/Then
@@ -198,7 +193,6 @@ class ReservationFacadeTest{
         `when`(userService.getUserWithLock(anyOrNull())).thenReturn(user)
         `when`(userService.getPoint(anyOrNull())).thenReturn(point)
         `when`(pointService.save(anyOrNull())).thenReturn(point)
-        `when`(queueStatusChecker.isQueueStatusPass(user.id)).thenReturn(true)
         `when`(seatService.get(anyOrNull())).thenReturn(seat)
         // When
         val result = reservationFacade.confirmReservation(reservation.id)

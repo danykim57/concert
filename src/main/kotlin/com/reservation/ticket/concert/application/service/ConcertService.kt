@@ -15,6 +15,8 @@ class ConcertService(
 
     fun get(id: Long): Optional<Concert> = concertRepository.findById(id)
 
+    fun create(concert: Concert): Concert = concertRepository.save(concert)
+
     fun getAvailableConcerts(): List<Concert> {
         // 예약 가능한 콘서트를 리포지토리에서 조회
         return concertRepository.findAvailableConcerts()

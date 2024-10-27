@@ -1,6 +1,5 @@
 package com.reservation.ticket.concert.application.service
 
-import com.reservation.ticket.concert.application.token.QueueStatusChecker
 import com.reservation.ticket.concert.domain.Payment
 import com.reservation.ticket.concert.domain.PaymentType
 import com.reservation.ticket.concert.domain.Reservation
@@ -26,6 +25,7 @@ class ReservationService(
     private val pointRepository: PointRepository,
     private val paymentRepository: PaymentRepository,
     private val queueRepository: QueueRepository,
+    private val userService: UserService,
 ) {
 
     fun get(id: Long): Reservation {
@@ -138,4 +138,5 @@ class ReservationService(
     fun getUserReservations(userId: UUID): List<Reservation> {
         return reservationRepository.findAllByUserId(userId)
     }
+
 }
