@@ -1,4 +1,4 @@
-package com.reservation.ticket.concert.application.schedule
+package com.reservation.ticket.concert.interfaces.schedule
 
 import com.reservation.ticket.concert.domain.ReservationStatus
 import com.reservation.ticket.concert.infrastructure.QueueRepository
