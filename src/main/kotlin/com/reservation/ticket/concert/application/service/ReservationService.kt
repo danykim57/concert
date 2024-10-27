@@ -1,12 +1,21 @@
 package com.reservation.ticket.concert.application.service
 
 import com.reservation.ticket.concert.application.token.QueueStatusChecker
-import com.reservation.ticket.concert.domain.*
-import com.reservation.ticket.concert.infrastructure.*
+import com.reservation.ticket.concert.domain.Payment
+import com.reservation.ticket.concert.domain.PaymentType
+import com.reservation.ticket.concert.domain.Reservation
+import com.reservation.ticket.concert.domain.ReservationStatus
+import com.reservation.ticket.concert.infrastructure.ConcertRepository
+import com.reservation.ticket.concert.infrastructure.PaymentRepository
+import com.reservation.ticket.concert.infrastructure.PointRepository
+import com.reservation.ticket.concert.infrastructure.QueueRepository
+import com.reservation.ticket.concert.infrastructure.ReservationRepository
+import com.reservation.ticket.concert.infrastructure.SeatRepository
+import com.reservation.ticket.concert.infrastructure.UserRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
-import java.util.*
+import java.util.UUID
 
 @Service
 class ReservationService(
@@ -16,10 +25,14 @@ class ReservationService(
     private val concertRepository: ConcertRepository,
     private val pointRepository: PointRepository,
     private val paymentRepository: PaymentRepository,
-    private val queueStatusChecker: QueueStatusChecker,
-    private val queueService: QueueService,
     private val queueRepository: QueueRepository,
 ) {
+
+    fun get(id: Long): Reservation {
+        return reservationRepository.findById(id).orElseThrow {
+            throw IllegalArgumentException("해당 예약이 존재하지 않습니다.")
+        }
+    }
 
     fun save(reservation: Reservation): Reservation {
         return reservationRepository.save(reservation)
@@ -38,16 +51,11 @@ class ReservationService(
             throw IllegalArgumentException("해당 유저를 찾을 수 없습니다.")
         }
 
-        if (queueStatusChecker.isQueueStatusPass(user.id)) {
-            throw IllegalArgumentException("유효하지 않은 토큰 입니다.")
-        }
-
-
-        val concert = concertRepository.findById(reservation.concert.id).orElseThrow {
+        concertRepository.findById(reservation.concert.id).orElseThrow {
             throw IllegalArgumentException("콘서트가 존재하지 않습니다.")
         }
 
-        val seat = seatRepository.findById(reservation.seat.id).orElseThrow{
+        val seat = seatRepository.findWriteLockById(reservation.seat.id).orElseThrow{
             throw IllegalArgumentException("존재하지 않은 좌석 입니다.")
         }
 

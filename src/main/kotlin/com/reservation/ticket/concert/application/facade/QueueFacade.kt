@@ -5,6 +5,7 @@ import com.reservation.ticket.concert.application.service.QueueService
 import com.reservation.ticket.concert.application.service.UserService
 import com.reservation.ticket.concert.interfaces.request.TokenRequest
 import com.reservation.ticket.concert.interfaces.response.TokenResponse
+import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import org.springframework.web.bind.annotation.RequestBody
 
@@ -20,7 +21,8 @@ class QueueFacade(
         val concert = concertService.get(req.concertCode)
         val token = queueService.createQueue(user, concert)
         return TokenResponse(
-            code = "success",
+            status = HttpStatus.OK.value(),
+            code = HttpStatus.OK.reasonPhrase,
             token = token,
         )
     }

@@ -4,7 +4,7 @@ import com.reservation.ticket.concert.domain.Concert
 import com.reservation.ticket.concert.domain.Queue
 import com.reservation.ticket.concert.domain.QueueStatus
 import org.springframework.data.jpa.repository.JpaRepository
-import java.util.*
+import java.util.UUID
 
 interface QueueRepository : JpaRepository<Queue, Long> {
     // 유저가 대기열에 있는지 조회
