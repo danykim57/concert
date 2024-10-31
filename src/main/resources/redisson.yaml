@@ -1,0 +1,4 @@
+singleServerConfig:
+  address: "redis://127.0.0.1:6379"  # Redis 서버 주소
+  password: null                      # 필요 시 비밀번호 설정
+  connectionPoolSize: 10              # 연결 풀 사이즈

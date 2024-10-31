@@ -5,12 +5,18 @@ import com.reservation.ticket.concert.domain.Concert
 import com.reservation.ticket.concert.domain.Seat
 import com.reservation.ticket.concert.infrastructure.ConcertRepository
 import com.reservation.ticket.concert.infrastructure.SeatRepository
+import com.reservation.ticket.concert.infrastructure.exception.UnprocessableEntityException
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import java.time.LocalDateTime
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.Executors
+import java.util.concurrent.atomic.AtomicInteger
+import java.util.concurrent.TimeUnit
 
 @SpringBootTest
 class SeatServiceIntegrationTest(
@@ -55,5 +61,38 @@ class SeatServiceIntegrationTest(
         val seats = seatService.getAvailableSeats(date)
         println("size: " + seats.size)
         assertTrue(seats.isNotEmpty())
+    }
+
+    @Test
+    fun `50 users try saveWithDistributedLock and only one person succeed to reserve the seat`() {
+        // given: get the seat1 from SetUp function
+        val seat = seatService.get(1L);
+
+        // when: 50 users call saveWithDistributedLock
+        val userCount = 50
+        val latch = CountDownLatch(1)
+        val completionLatch = CountDownLatch(userCount)
+        val successCount = AtomicInteger(0)
+        val executorService = Executors.newFixedThreadPool(userCount)
+
+        repeat(userCount) {
+            executorService.submit {
+                try {
+                    latch.await()
+                    seatService.saveWithDistributedLock(seat!!.id)
+                    successCount.incrementAndGet()
+                } catch (e: UnprocessableEntityException) {
+                } finally {
+                    completionLatch.countDown()
+                }
+            }
+        }
+
+        latch.countDown()
+        completionLatch.await(10, TimeUnit.SECONDS)
+
+        // then: only one request should succeed
+        assertEquals(1, successCount.get(), "Only one request should succeed")
+        executorService.shutdown()
     }
 }
