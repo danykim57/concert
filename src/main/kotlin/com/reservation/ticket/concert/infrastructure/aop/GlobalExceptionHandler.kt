@@ -36,6 +36,7 @@ class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(UnprocessableEntityException::class)
+    @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
     fun handleCustomException(ex: UnprocessableEntityException): CommonResponse {
         logger.warn(ex.message, ex)
 
@@ -47,6 +48,7 @@ class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(IllegalArgumentException::class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     fun handleCustomException(ex: IllegalArgumentException): CommonResponse {
         logger.warn(ex.message, ex)
 
@@ -58,6 +60,7 @@ class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(BadRequest::class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     fun handleCustomException(ex: BadRequest): CommonResponse {
         logger.warn(ex.message, ex)
 
@@ -69,6 +72,7 @@ class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(Forbidden::class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
     fun handleCustomException(ex: Forbidden): CommonResponse {
         logger.warn(ex.message, ex)
 
@@ -80,6 +84,7 @@ class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(UserNotFoundException::class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
     fun handleCustomException(ex: UserNotFoundException): CommonResponse {
         logger.warn(ex.message, ex)
 
@@ -91,6 +96,7 @@ class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(AfterDeadlineException::class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     fun handleCustomException(ex: AfterDeadlineException): CommonResponse {
         logger.warn(ex.message, ex)
 
@@ -102,6 +108,7 @@ class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(PaymentTimeOutException::class)
+    @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
     fun handleCustomException(ex: PaymentTimeOutException): CommonResponse {
         logger.warn(ex.message, ex)
 
@@ -113,6 +120,7 @@ class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(PaymentFailedAmountException::class)
+    @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
     fun handleCustomException(ex: PaymentFailedAmountException): CommonResponse {
         logger.warn(ex.message, ex)
 
@@ -124,6 +132,7 @@ class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(UnAuthorizedException::class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
     fun handleCustomException(ex: UnAuthorizedException): CommonResponse {
         logger.warn(ex.message, ex)
 
