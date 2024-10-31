@@ -41,7 +41,6 @@ class UserService(
          return user
     }
 
-    //TODO 유저 포인트 가져오기
     fun getPoint(userId: UUID): Point {
         return pointRepository.findByUserId(userId) ?: throw IllegalArgumentException("해당 유저의 포인트 정보가 존재하지 않습니다.")
     }
@@ -52,10 +51,14 @@ class UserService(
         return point.amount
     }
 
+    fun getWithPessimisticLock(userId: UUID): Point? {
+        return pointRepository.findByUserId(userId)
+    }
+
     @Transactional
     fun add(request: PointRequest): Point {
         // 유저 ID로 포인트 정보 조회
-        var point = pointRepository.findByUserId(request.userId)
+        var point = getWithPessimisticLock(request.userId)
         val user = userRepository.findById(request.userId).get()
         if (point == null) {
             // 포인트 정보가 없는 경우 새로운 포인트 엔티티 생성
@@ -70,7 +73,7 @@ class UserService(
 
     @Transactional
     fun spend(request: PointRequest): Point {
-        var point = pointRepository.findByUserId(request.userId)
+        var point = getWithPessimisticLock(request.userId)
         val user = userRepository.findById(request.userId).get()
         if (point == null) {
             // 포인트 정보가 없는 경우 새로운 포인트 엔티티 생성

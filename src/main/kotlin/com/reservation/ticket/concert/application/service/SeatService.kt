@@ -1,6 +1,8 @@
 package com.reservation.ticket.concert.application.service
 
+import com.reservation.ticket.concert.domain.Concert
 import com.reservation.ticket.concert.domain.Seat
+import com.reservation.ticket.concert.infrastructure.ConcertRepository
 import com.reservation.ticket.concert.infrastructure.SeatRepository
 import com.reservation.ticket.concert.infrastructure.annotation.DistributedLock
 import com.reservation.ticket.concert.infrastructure.exception.UnprocessableEntityException
@@ -9,7 +11,10 @@ import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
 
 @Service
-class SeatService(private val seatRepository: SeatRepository) {
+class SeatService(
+    private val seatRepository: SeatRepository,
+    private val concertRepository: ConcertRepository,
+    ) {
 
     // 예약 날짜에 해당하는 예약 가능한 좌석 목록을 조회
     @Transactional
@@ -33,6 +38,26 @@ class SeatService(private val seatRepository: SeatRepository) {
         return seatRepository.save(seat)
     }
 
+    fun createSeatForTest(): Seat {
+        // 예시로 기본 사용 가능 좌석 생성
+
+        val concert = concertRepository.save(
+            Concert(
+                name = "Test Concert",
+                availableTickets = 50,
+                location = "Chicago",
+                date = LocalDateTime.of(2040, 12, 31, 19, 0),
+            )
+        )
+        val seat = Seat(
+            seatNumber = "A1",
+            isAvailable = true,
+            concert = concert,
+            price = 10.0
+        )
+        return seatRepository.save(seat)
+    }
+
     fun save(seatId: Long): Seat {
         val seat = getWithLock(seatId)
             ?: throw UnprocessableEntityException("해당 좌석이 존재하지 않습니다.")
@@ -46,7 +71,6 @@ class SeatService(private val seatRepository: SeatRepository) {
         return save(seat)
     }
 
-    //TODO: 좌석 예약 분산락
     @DistributedLock(lockKey = "seatKey", timeout = 5000)
     fun saveWithDistributedLock(seatId: Long): Seat {
         val seat = get(seatId)
