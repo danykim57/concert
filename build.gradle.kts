@@ -31,6 +31,8 @@ dependencies {
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0")
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
+    implementation("org.testcontainers:testcontainers:1.20.3")
+    implementation("com.redis.testcontainers:testcontainers-redis:1.6.4")
 
     runtimeOnly("com.h2database:h2")
 
@@ -41,6 +43,9 @@ dependencies {
     testImplementation("org.mybatis.spring.boot:mybatis-spring-boot-starter-test:3.0.3")
     testImplementation("org.springframework.restdocs:spring-restdocs-mockmvc")
     testImplementation("org.mockito.kotlin:mockito-kotlin:3.2.0")
+    testImplementation("org.testcontainers:testcontainers:1.20.3")
+    testImplementation("com.redis.testcontainers:testcontainers-redis:1.6.4")
+    testImplementation("org.testcontainers:junit-jupiter:1.18.0")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
