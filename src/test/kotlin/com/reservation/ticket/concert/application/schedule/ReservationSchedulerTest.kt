@@ -6,6 +6,7 @@ import com.reservation.ticket.concert.domain.Queue
 import com.reservation.ticket.concert.infrastructure.QueueRepository
 import com.reservation.ticket.concert.infrastructure.ReservationRepository
 import com.reservation.ticket.concert.infrastructure.SeatRepository
+import com.reservation.ticket.concert.interfaces.schedule.ReservationScheduler
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.BeforeEach
 import org.mockito.InjectMocks

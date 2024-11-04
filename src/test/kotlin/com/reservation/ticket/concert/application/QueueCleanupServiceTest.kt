@@ -1,6 +1,6 @@
 package com.reservation.ticket.concert.application
 
-import com.reservation.ticket.concert.application.schedule.QueueCleanupService
+import com.reservation.ticket.concert.interfaces.schedule.QueueCleanupService
 import com.reservation.ticket.concert.domain.Concert
 import com.reservation.ticket.concert.domain.Queue
 import com.reservation.ticket.concert.domain.QueueStatus
