@@ -6,6 +6,7 @@ import com.reservation.ticket.concert.domain.Seat
 import com.reservation.ticket.concert.infrastructure.ConcertRepository
 import com.reservation.ticket.concert.infrastructure.SeatRepository
 import com.reservation.ticket.concert.infrastructure.exception.UnprocessableEntityException
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
@@ -17,13 +18,46 @@ import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.TimeUnit
+import org.springframework.data.redis.connection.RedisConnectionFactory
+import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory
+import org.springframework.data.redis.core.StringRedisTemplate
+import org.springframework.data.redis.core.RedisTemplate
+import org.testcontainers.containers.GenericContainer
+import org.testcontainers.junit.jupiter.Testcontainers
+import org.testcontainers.utility.DockerImageName
 
+@Testcontainers
 @SpringBootTest
 class SeatServiceIntegrationTest(
     @Autowired val seatService: SeatService,
     @Autowired val seatRepository: SeatRepository,
     @Autowired val concertRepository: ConcertRepository
 ) {
+
+    private val redisContainer = GenericContainer(DockerImageName.parse("redis:7.0.5")).apply {
+        withExposedPorts(6379)
+    }
+
+    private lateinit var redisTemplate: RedisTemplate<String, String>
+
+    @BeforeEach
+    fun setUpRedis() {
+        redisContainer.start()
+
+        val redisHost = redisContainer.host
+        val redisPort = redisContainer.getMappedPort(6379)
+
+        // Configure Redis connection factory
+        val redisConnectionFactory: RedisConnectionFactory = LettuceConnectionFactory(redisHost, redisPort)
+        redisTemplate = StringRedisTemplate(redisConnectionFactory as LettuceConnectionFactory)
+        redisConnectionFactory.afterPropertiesSet()
+    }
+
+    @AfterEach
+    fun tearDown() {
+        redisContainer.stop()
+    }
+
     @BeforeEach
     fun setup() {
         // 콘서트 생성
