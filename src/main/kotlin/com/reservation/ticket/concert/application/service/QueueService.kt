@@ -4,6 +4,7 @@ import com.reservation.ticket.concert.domain.Concert
 import com.reservation.ticket.concert.domain.Queue
 import com.reservation.ticket.concert.domain.QueueStatus
 import com.reservation.ticket.concert.domain.User
+import com.reservation.ticket.concert.infrastructure.QueueRedisRepository
 import com.reservation.ticket.concert.infrastructure.QueueRepository
 import com.reservation.ticket.concert.infrastructure.exception.ForbiddenException
 import org.springframework.stereotype.Service
@@ -12,21 +13,19 @@ import java.util.UUID
 
 @Service
 class QueueService(
-    private val queueRepository: QueueRepository
+    private val queueRepository: QueueRepository,
+    private val queueRedisRepository: QueueRedisRepository,
 ) {
     fun get(userId: UUID): Queue {
         return queueRepository.findByUserId(userId) ?: throw IllegalArgumentException("존재하지 않는 대기열 토큰 입니다.")
     }
 
-    // 유저의 대기 순번을 조회하는 메서드
     fun getUserQueuePosition(userId: UUID): Int {
-        // 유저가 대기열에 있는지 확인
+
         val userQueue = get(userId)
 
-        // 모든 대기열을 시간순으로 조회
         val allQueues = queueRepository.findAllByOrderByCreatedAtAsc()
 
-        // 유저의 대기 순번을 계산 (1부터 시작)
         return allQueues.indexOf(userQueue) + 1
     }
 
@@ -64,5 +63,32 @@ class QueueService(
 
     fun delete(queue: Queue) {
         return queueRepository.delete(queue)
+    }
+
+    fun addUserToWaitQueue(userId: String, timestamp: Double) {
+        queueRedisRepository.addToWaitQueue(userId, timestamp)
+    }
+
+    fun getUserRankInQueue(userId: String): Long? {
+        return queueRedisRepository.getUserRank(userId)
+    }
+
+    // 활성 상태로 전환
+    fun activateUsers(limit: Long) {
+        val usersToActivate = queueRedisRepository.getUsersInRange(0, limit - 1)
+        usersToActivate.forEach { userId ->
+            queueRedisRepository.removeFromWaitQueue(userId)
+            queueRedisRepository.setUserActive(userId, ttl = 300) // 5분
+        }
+    }
+
+    // 활성 상태 사용자 가져오기
+    fun getActiveUsers(): Set<String> {
+        return queueRedisRepository.getActiveUsers()
+    }
+
+    // 결제 완료 후 사용자 제거
+    fun completeUserProcess(userId: String) {
+        queueRedisRepository.completeUser(userId)
     }
 }

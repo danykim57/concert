@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Assertions.*
 import com.reservation.ticket.concert.domain.*
 import com.reservation.ticket.concert.domain.Queue
 import com.reservation.ticket.concert.infrastructure.*
-import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
@@ -38,6 +37,9 @@ class ReservationServiceTest {
 
     @Mock
     private lateinit var queueRepository: QueueRepository
+
+    @Mock
+    private lateinit var queueRedisRepository: QueueRedisRepository
 
     @Mock
     private lateinit var pointRepository: PointRepository
