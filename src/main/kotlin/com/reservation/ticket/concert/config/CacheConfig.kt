@@ -39,6 +39,7 @@ class CacheConfig {
             .withCacheConfiguration("concert", defaultConfig.entryTtl(Duration.ofHours(24)))
             .withCacheConfiguration("availableConcerts", defaultConfig.entryTtl(Duration.ofHours(24)))
             .withCacheConfiguration("seat", defaultConfig.entryTtl(Duration.ofHours(24)))
+            .withCacheConfiguration("availableSeats", defaultConfig.entryTtl(Duration.ofHours(24)))
             .build()
     }
 }

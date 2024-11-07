@@ -98,7 +98,10 @@ class SeatService(
         }
 
         seat.isAvailable = false
-        return save(seat)
+        val resultSeat = save(seat)
+        val cache = cacheManager.getCache("seat")
+        cache?.put("seat", resultSeat)
+        return resultSeat
     }
 
 }
