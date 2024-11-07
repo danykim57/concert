@@ -9,43 +9,46 @@ import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.JoinColumn
 import jakarta.persistence.ManyToOne
-import jakarta.persistence.Version
 import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.annotation.LastModifiedDate
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
+import java.io.Serializable
 import java.time.LocalDateTime
 
 @Entity
 @EntityListeners(AuditingEntityListener::class)
 class Seat(
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long = 0,
-
-    @Column
     val seatNumber: String,
-
-    @Column
-    var isAvailable: Boolean = true,
-
     @ManyToOne
     @JoinColumn(name = "concert_id")
     val concert: Concert,
+    val price: Double,
+) : Serializable {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    var id: Long = 0
 
     @Column
-    var price: Double,
+    var isAvailable: Boolean = true
 
-    @Version
-    var version: Long? = null,
-
-    @CreatedDate  // 엔티티가 생성될 때 자동으로 설정됨
+    @CreatedDate
     @Column(nullable = false, updatable = false)
-    var createdAt: LocalDateTime? = null,
+    var createdAt: LocalDateTime? = LocalDateTime.now()
 
-    @LastModifiedDate  // 엔티티가 수정될 때 자동으로 설정됨
+    @LastModifiedDate
     @Column(nullable = false)
     var updatedAt: LocalDateTime? = null
 
-)
+    constructor(seatNumber: String, concert: Concert, price: Double, isAvailable: Boolean): this(seatNumber, concert, price) {
+        this.isAvailable = isAvailable
+    }
+
+    constructor(id: Long, seatNumber: String, concert: Concert, price: Double, isAvailable: Boolean): this(seatNumber, concert, price) {
+        this.isAvailable = isAvailable
+        this.id = id
+    }
+
+}
 
 fun Seat.toDto(): SeatDTO {
     return SeatDTO(
