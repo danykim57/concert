@@ -4,29 +4,34 @@ import com.reservation.ticket.concert.domain.Concert
 import com.reservation.ticket.concert.domain.Queue
 import com.reservation.ticket.concert.domain.QueueStatus
 import com.reservation.ticket.concert.domain.User
+import com.reservation.ticket.concert.infrastructure.QueueRedisRepository
 import com.reservation.ticket.concert.infrastructure.QueueRepository
 import com.reservation.ticket.concert.infrastructure.exception.ForbiddenException
+import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.util.UUID
 
 @Service
 class QueueService(
-    private val queueRepository: QueueRepository
+    private val queueRepository: QueueRepository,
+    private val queueRedisRepository: QueueRedisRepository,
+    private val redisTemplate: RedisTemplate<String, String>
 ) {
+
+    private val cycleSize = 50  // 사이클당 대기 인원수
+    private val cycleWaitTimeMinutes = 5
+
     fun get(userId: UUID): Queue {
         return queueRepository.findByUserId(userId) ?: throw IllegalArgumentException("존재하지 않는 대기열 토큰 입니다.")
     }
 
-    // 유저의 대기 순번을 조회하는 메서드
     fun getUserQueuePosition(userId: UUID): Int {
-        // 유저가 대기열에 있는지 확인
+
         val userQueue = get(userId)
 
-        // 모든 대기열을 시간순으로 조회
         val allQueues = queueRepository.findAllByOrderByCreatedAtAsc()
 
-        // 유저의 대기 순번을 계산 (1부터 시작)
         return allQueues.indexOf(userQueue) + 1
     }
 
@@ -64,5 +69,27 @@ class QueueService(
 
     fun delete(queue: Queue) {
         return queueRepository.delete(queue)
+    }
+
+    // 대기열에 사용자 추가 (concertId에 따른 순서)
+    fun addToQueue(concertId: String, userId: String): Long {
+
+        val operationNum = redisTemplate.opsForSet().add(concertId, userId)
+        val isAdded = if (operationNum != null) true else false
+
+        //Set의 사이즈를 대기 순서로 반환
+        return if (isAdded) redisTemplate.opsForSet().size(concertId) ?: 1 else -1
+    }
+
+    fun getUserPosition(concertId: String, userId: String): Long? {
+        val queueKey = "concertQueue:$concertId"
+        // Redis ZSet에서 특정 사용자(userId)의 rank를 조회
+        val rank = redisTemplate.opsForZSet().rank(queueKey, userId)
+        return rank?.plus(1)  // 0부터 시작하므로 1을 더하여 1-based 순서를 반환
+    }
+
+    fun calculateEntryTime(concertId: String, userOrder: Long): Long {
+        // 입장 시간 계산: (순서 / 사이클당 인원수) * 사이클당 대기시간
+        return (userOrder / cycleSize) * cycleWaitTimeMinutes.toLong()
     }
 }

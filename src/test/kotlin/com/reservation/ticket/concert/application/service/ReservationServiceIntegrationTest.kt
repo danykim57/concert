@@ -27,6 +27,9 @@ class ReservationServiceIntegrationTest {
     private lateinit var queueRepository: QueueRepository
 
     @Autowired
+    private lateinit var queueRedisRepository: QueueRedisRepository
+
+    @Autowired
     private lateinit var seatRepository: SeatRepository
 
     @Autowired

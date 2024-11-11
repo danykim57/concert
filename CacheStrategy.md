@@ -149,8 +149,9 @@ fun getAvailableConcerts(): List<Concert> {
 - 구현: 레디스 Write Through
 ```kotlin
 // 콘서트 날짜 범위에 맞는 좌석을 조회하는 쿼리 메서드
-@Cacheable(value = ["availableSeats"], cacheManager = "redisCacheManager")
-fun findByConcertDateBetween(startDate: LocalDateTime, endDate: LocalDateTime): List<Seat> 
+
+//@Cacheable(value = ["availableSeats"], cacheManager = "redisCacheManager")
+//fun findByConcertDateBetween(startDate: LocalDateTime, endDate: LocalDateTime): List<Seat> 
 ```
 - 캐시 만료처리: TTL (24시간), 데이터가 잘 바뀌지 않을 것을 고려하여서 하루로 정하였습니다.
 
