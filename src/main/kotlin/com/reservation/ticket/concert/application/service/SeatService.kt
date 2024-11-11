@@ -6,6 +6,7 @@ import com.reservation.ticket.concert.infrastructure.ConcertRepository
 import com.reservation.ticket.concert.infrastructure.SeatRepository
 import com.reservation.ticket.concert.infrastructure.annotation.DistributedLock
 import com.reservation.ticket.concert.infrastructure.exception.UnprocessableEntityException
+import org.springframework.data.redis.cache.RedisCacheManager
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
@@ -14,6 +15,7 @@ import java.time.LocalDateTime
 class SeatService(
     private val seatRepository: SeatRepository,
     private val concertRepository: ConcertRepository,
+    private val cacheManager: RedisCacheManager,
     ) {
 
     // 예약 날짜에 해당하는 예약 가능한 좌석 목록을 조회
@@ -29,13 +31,27 @@ class SeatService(
     }
 
     fun getWithLock(seatId: Long): Seat? {
-        return seatRepository.findWriteLockById(seatId).orElseThrow {
+
+        val cache = cacheManager.getCache("seat")
+        val cachedSeat = cache?.get("seat", Seat::class.java)
+
+        if (cachedSeat != null) {
+            return cachedSeat
+        }
+        val resultSeat =  seatRepository.findWriteLockById(seatId).orElseThrow {
             throw IllegalArgumentException("해당 좌석이 존재하지 않습니다.")
         }
+
+        cache?.put("seat", resultSeat)
+
+        return resultSeat
     }
 
     fun save(seat: Seat): Seat {
-        return seatRepository.save(seat)
+        val savedSeat = seatRepository.save(seat)
+        val cache = cacheManager.getCache("seat")
+        cache?.put("seat", savedSeat)
+        return savedSeat
     }
 
     fun createSeatForTest(): Seat {
@@ -82,7 +98,10 @@ class SeatService(
         }
 
         seat.isAvailable = false
-        return save(seat)
+        val resultSeat = save(seat)
+        val cache = cacheManager.getCache("seat")
+        cache?.put("seat", resultSeat)
+        return resultSeat
     }
 
 }
