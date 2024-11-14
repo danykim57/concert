@@ -11,6 +11,8 @@ import com.reservation.ticket.concert.domain.Payment
 import com.reservation.ticket.concert.domain.PaymentType
 import com.reservation.ticket.concert.domain.ReservationMessage
 import com.reservation.ticket.concert.domain.ReservationStatus
+import com.reservation.ticket.concert.infrastructure.event.EventPublisher
+import com.reservation.ticket.concert.infrastructure.event.ReservationEvent
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
@@ -24,6 +26,7 @@ class ReservationFacade (
     private val queueService: QueueService,
     private val pointService: PointService,
     private val paymentService: PaymentService,
+    private val eventPublisher: EventPublisher<ReservationEvent>,
     ){
 
     // 결제 및 예약 상태 변경
@@ -82,7 +85,9 @@ class ReservationFacade (
 
         // 예약 정보 저장
         reservation.status = ReservationStatus.CONFIRMED
-        reservationService.save(reservation)
+//        reservationService.save(reservation)
+        eventPublisher.publish(ReservationEvent.from(reservation))
+
 
         //대기열 삭제
         queueService.delete(queue)
