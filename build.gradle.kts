@@ -35,6 +35,7 @@ dependencies {
     implementation("org.testcontainers:testcontainers:1.20.3")
     implementation("com.redis.testcontainers:testcontainers-redis:1.6.4")
 
+    implementation("mysql:mysql-connector-java:8.0.32")
     runtimeOnly("com.h2database:h2")
 
     developmentOnly("org.springframework.boot:spring-boot-devtools")
