@@ -18,7 +18,7 @@ class QueueCleanupService(
     }
 
 
-    @Scheduled(fixedRate = 60000)  // 1분마다 실행
+//    @Scheduled(fixedRate = 60000)  // 1분마다 실행
     @Transactional
     fun cleanUpOldQueues() {
         // 현재 시간

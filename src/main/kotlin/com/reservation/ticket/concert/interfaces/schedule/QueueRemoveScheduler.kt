@@ -12,7 +12,7 @@ class RemoveFromQueueScheduler(
     private val logger = LoggerFactory.getLogger(RemoveFromQueueScheduler::class.java)
 
     // 1분마다 실행, 대기열에서 상위 50명 제거
-    @Scheduled(fixedRate = 60000)
+//    @Scheduled(fixedRate = 60000)
     fun removeFromQueue() {
         val concertId = "exampleConcert"  // 예제 콘서트 ID
         val queueKey = "concertQueue:$concertId"

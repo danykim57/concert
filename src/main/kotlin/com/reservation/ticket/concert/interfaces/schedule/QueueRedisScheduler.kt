@@ -16,7 +16,7 @@ class QueueRedisScheduler(
     private val logger = LoggerFactory.getLogger(QueueRedisScheduler::class.java)
 
     // 1분마다 실행
-    @Scheduled(fixedRate = 60000)
+//    @Scheduled(fixedRate = 60000)
     fun activateNextBatch() {
         val concertId = "exampleConcert"  // 예제 콘서트 ID
         val queueKey = "concertQueue:$concertId"
