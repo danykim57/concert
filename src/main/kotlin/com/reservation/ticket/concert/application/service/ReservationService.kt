@@ -71,7 +71,7 @@ class ReservationService(
             // 예약 취소처리
             reservation.status = ReservationStatus.CANCELLED
             reservationRepository.save(reservation)
-            throw IllegalArgumentException("")
+            throw IllegalArgumentException("예약 가능 시간이 만료되었습니다.")
         }
 
 
