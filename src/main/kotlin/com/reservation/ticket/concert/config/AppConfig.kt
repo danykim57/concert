@@ -5,10 +5,10 @@ import org.springframework.boot.ApplicationRunner
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
-@Configuration
+//@Configuration // for bulk-insert
 class AppConfig(private val bulkInsertService: BulkInsertService) {
 
-    @Bean
+//    @Bean
     fun initData(): ApplicationRunner {
         return ApplicationRunner {
             bulkInsertService.bulkInsertConcerts(1_000_000)

@@ -135,7 +135,7 @@ Saga Pattern을 하기에는 시간이 없고 2PC 방식을 간소화 시켜서 
 ```kotlin
         // 예약 정보 저장
         reservation.status = ReservationStatus.CONFIRMED
-//        reservationService.save(reservation)
+        //reservationService.save(reservation)
         eventPublisher.publish(ReservationEvent.from(reservation))
 ```
 
