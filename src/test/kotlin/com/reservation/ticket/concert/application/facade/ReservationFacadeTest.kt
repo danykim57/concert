@@ -15,6 +15,8 @@ import com.reservation.ticket.concert.domain.Reservation
 import com.reservation.ticket.concert.domain.ReservationStatus
 import com.reservation.ticket.concert.domain.Seat
 import com.reservation.ticket.concert.domain.User
+import com.reservation.ticket.concert.infrastructure.event.EventPublisher
+import com.reservation.ticket.concert.infrastructure.event.ReservationEvent
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
@@ -44,6 +46,7 @@ class ReservationFacadeTest{
     private lateinit var queueService: QueueService
     private lateinit var pointService: PointService
     private lateinit var paymentService: PaymentService
+    private lateinit var eventPublisher: EventPublisher<ReservationEvent>
 
     @BeforeEach
     fun setUp() {
@@ -54,6 +57,7 @@ class ReservationFacadeTest{
         queueService = mock(QueueService::class.java)
         pointService = mock(PointService::class.java)
         paymentService = mock(PaymentService::class.java)
+        eventPublisher = mock(EventPublisher::class.java) as EventPublisher<ReservationEvent>
 
         // Facade 생성 시 목 객체를 주입
         reservationFacade = ReservationFacade(
@@ -63,7 +67,8 @@ class ReservationFacadeTest{
             seatService,
             queueService,
             pointService,
-            paymentService
+            paymentService,
+            eventPublisher,
         )
     }
 
