@@ -1,5 +1,6 @@
 package com.reservation.ticket.concert.infrastructure.event
 
+import com.reservation.ticket.concert.domain.Outbox
 import org.springframework.stereotype.Repository
 
 @Repository

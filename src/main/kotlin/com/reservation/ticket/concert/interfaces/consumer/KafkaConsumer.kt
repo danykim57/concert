@@ -1,4 +1,4 @@
-package com.reservation.ticket.concert.infrastructure.event
+package com.reservation.ticket.concert.interfaces.consumer
 
 import org.slf4j.LoggerFactory
 import org.springframework.kafka.annotation.KafkaListener

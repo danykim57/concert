@@ -2,11 +2,11 @@ package com.reservation.ticket.concert.application.service
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.reservation.ticket.concert.domain.Reservation
-import com.reservation.ticket.concert.infrastructure.event.Outbox
+import com.reservation.ticket.concert.domain.Outbox
 import com.reservation.ticket.concert.infrastructure.event.OutboxEvent
 import com.reservation.ticket.concert.infrastructure.event.OutboxProducer
 import com.reservation.ticket.concert.infrastructure.event.OutboxRepository
-import com.reservation.ticket.concert.infrastructure.event.OutboxStatus
+import com.reservation.ticket.concert.domain.OutboxStatus
 import org.springframework.stereotype.Service
 import java.util.UUID
 

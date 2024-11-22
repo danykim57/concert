@@ -1,6 +1,6 @@
-package com.reservation.ticket.concert.infrastructure.event
+package com.reservation.ticket.concert.domain
 
-import com.fasterxml.jackson.databind.ObjectMapper
+import com.reservation.ticket.concert.infrastructure.event.OutboxEvent
 import jakarta.persistence.Entity
 import jakarta.persistence.EnumType
 import jakarta.persistence.Enumerated

@@ -5,20 +5,16 @@ import org.slf4j.LoggerFactory
 import org.springframework.kafka.core.KafkaTemplate
 import org.springframework.retry.annotation.Backoff
 import org.springframework.retry.annotation.Retryable
-import org.springframework.stereotype.Repository
+import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
 
-@Repository
+@Component
 class OutboxProducer(
     private val kafkaTemplate: KafkaTemplate<String, String>,
 ) {
     private val logger: Logger = LoggerFactory.getLogger(OutboxProducer::class.java)
 
-    @Retryable(
-        value = [Exception::class],
-        maxAttempts = 3,
-        backoff = Backoff(delay = 1000, multiplier = 2.0),
-    )
+    @Retryable(value = [Exception::class], maxAttempts = 3, backoff = Backoff(delay = 1000, multiplier = 2.0))
     @Transactional
     fun publish(event: OutboxEvent): OutboxEvent {
         try {

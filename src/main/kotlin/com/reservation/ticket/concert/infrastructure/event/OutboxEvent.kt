@@ -1,6 +1,8 @@
 package com.reservation.ticket.concert.infrastructure.event
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.reservation.ticket.concert.domain.OutboxStatus
+import com.reservation.ticket.concert.domain.OutboxType
 import com.reservation.ticket.concert.domain.Reservation
 import java.time.LocalDateTime
 import java.util.UUID

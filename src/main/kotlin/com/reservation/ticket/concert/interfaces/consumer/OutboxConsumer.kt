@@ -1,4 +1,4 @@
-package com.reservation.ticket.concert.infrastructure.event
+package com.reservation.ticket.concert.interfaces.consumer
 
 import com.reservation.ticket.concert.application.service.OutboxService
 import org.slf4j.Logger
@@ -7,11 +7,13 @@ import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.kafka.support.Acknowledgment
 import org.springframework.messaging.handler.annotation.Header
 import org.springframework.messaging.handler.annotation.Payload
+import org.springframework.stereotype.Component
 
+@Component
 class OutboxConsumer(
-    private val logger: Logger = LoggerFactory.getLogger(OutboxConsumer::class.java),
     private val outboxService: OutboxService
 ) {
+    private val logger: Logger = LoggerFactory.getLogger(OutboxConsumer::class.java)
 
     @KafkaListener(
         topics = ["reservation-confirm-topic"],

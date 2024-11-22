@@ -1,4 +1,4 @@
-package com.reservation.ticket.concert.infrastructure.event
+package com.reservation.ticket.concert.domain
 
 enum class OutboxStatus {
     SUCCESS,
