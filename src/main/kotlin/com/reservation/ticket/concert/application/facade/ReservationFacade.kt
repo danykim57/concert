@@ -2,7 +2,6 @@ package com.reservation.ticket.concert.application.facade
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.reservation.ticket.concert.application.service.ConcertService
-import com.reservation.ticket.concert.application.service.OutboxService
 import com.reservation.ticket.concert.application.service.PaymentService
 import com.reservation.ticket.concert.application.service.PointService
 import com.reservation.ticket.concert.application.service.QueueService
@@ -30,6 +29,7 @@ class ReservationFacade (
     private val queueService: QueueService,
     private val pointService: PointService,
     private val paymentService: PaymentService,
+    private val eventPublisher: EventPublisher<ReservationEvent>,
     private val outboxProducer: OutboxProducer,
     ){
     // 결제 및 예약 상태 변경
@@ -49,6 +49,7 @@ class ReservationFacade (
 
         reservation.status = ReservationStatus.CONFIRMED
         val objectMapper = ObjectMapper()
+        eventPublisher.publish(ReservationEvent.from(reservation))
         outboxProducer.publish(OutboxEvent(reservation, objectMapper = objectMapper))
 
         //대기열 삭제
