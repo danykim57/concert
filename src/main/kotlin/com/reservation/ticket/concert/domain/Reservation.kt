@@ -1,5 +1,6 @@
 package com.reservation.ticket.concert.domain
 
+import com.reservation.ticket.concert.infrastructure.event.ReservationConfirmMessage
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.EntityListeners
@@ -46,7 +47,17 @@ class Reservation(
     @LastModifiedDate  // 엔티티가 수정될 때 자동으로 설정됨
     @Column(nullable = false)
     var updatedAt: LocalDateTime? = null
-)
+) {
+    fun of(message: ReservationConfirmMessage): Reservation {
+        return Reservation(
+            id = message.id,
+            seat = message.seat,
+            concert = message.concert,
+            userId = message.userId,
+            status = message.status,
+        )
+    }
+}
 
 enum class ReservationStatus {
     RESERVED,  // 예약

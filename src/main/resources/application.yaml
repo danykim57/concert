@@ -20,6 +20,26 @@ spring:
 #        format_sql: true          # 쿼리 로그 포맷 (정렬)
 #        show_sql: true            # 쿼리 로그 출력
 
+  # 카프카 설정
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      bootstrap-servers: localhost:9092
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      acks: all
+      enable-idempotence: true
+    consumer:
+      bootstrap-servers: localhost:9092
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      auto-offset-reset: earliest
+      group-id: reservation-confirm-group
+      enable-auto-commit: false
+    listener:
+      concurrency: 2
+      poll-timeout: 20000
+
 springdoc:
   default-consumes-media-type: application/json
   default-produces-media-type: application/json

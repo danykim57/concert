@@ -34,6 +34,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-cache")
     implementation("org.testcontainers:testcontainers:1.20.3")
     implementation("com.redis.testcontainers:testcontainers-redis:1.6.4")
+    implementation("org.springframework.kafka:spring-kafka")
 
     implementation("mysql:mysql-connector-java:8.0.32")
     runtimeOnly("com.h2database:h2")
@@ -46,6 +47,8 @@ dependencies {
     testImplementation("org.springframework.restdocs:spring-restdocs-mockmvc")
     testImplementation("org.mockito.kotlin:mockito-kotlin:3.2.0")
     testImplementation("org.testcontainers:testcontainers:1.20.3")
+    testImplementation("org.springframework.kafka:spring-kafka-test")
+    testImplementation("org.testcontainers:kafka")
     testImplementation("com.redis.testcontainers:testcontainers-redis:1.6.4")
     testImplementation("org.testcontainers:junit-jupiter:1.18.0")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")

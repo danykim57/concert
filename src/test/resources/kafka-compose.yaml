@@ -1,0 +1,17 @@
+version: '3.3'
+
+services:
+  zookeeper:
+    image: "wurstmeister/zookeeper"
+  kafka:
+    image: "wurstmeister/kafka"
+    ports:
+      - "9092:9092"
+    depends_on:
+      - "zookeeper"
+    environment:
+      KAFKA_ZOOKEEPER_CONNECT: "zookeeper:2181"
+      KAFKA_ADVERTISED_HOST_NAME: "${KAFKA_HOST:-localhost}"
+      KAFKA_ADVERTISED_PORT: "9092"
+      KAFKA_CREATE_TOPICS: "hello-world-topic"
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "false"

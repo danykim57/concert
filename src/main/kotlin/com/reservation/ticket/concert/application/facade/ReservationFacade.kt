@@ -1,5 +1,6 @@
 package com.reservation.ticket.concert.application.facade
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.reservation.ticket.concert.application.service.ConcertService
 import com.reservation.ticket.concert.application.service.PaymentService
 import com.reservation.ticket.concert.application.service.PointService
@@ -7,11 +8,13 @@ import com.reservation.ticket.concert.application.service.QueueService
 import com.reservation.ticket.concert.application.service.ReservationService
 import com.reservation.ticket.concert.application.service.SeatService
 import com.reservation.ticket.concert.application.service.UserService
-import com.reservation.ticket.concert.domain.Payment
-import com.reservation.ticket.concert.domain.PaymentType
+import com.reservation.ticket.concert.domain.Queue
+import com.reservation.ticket.concert.domain.Reservation
 import com.reservation.ticket.concert.domain.ReservationMessage
 import com.reservation.ticket.concert.domain.ReservationStatus
 import com.reservation.ticket.concert.infrastructure.event.EventPublisher
+import com.reservation.ticket.concert.infrastructure.event.OutboxEvent
+import com.reservation.ticket.concert.infrastructure.event.OutboxProducer
 import com.reservation.ticket.concert.infrastructure.event.ReservationEvent
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -27,22 +30,37 @@ class ReservationFacade (
     private val pointService: PointService,
     private val paymentService: PaymentService,
     private val eventPublisher: EventPublisher<ReservationEvent>,
+    private val outboxProducer: OutboxProducer,
     ){
-
     // 결제 및 예약 상태 변경
     @Transactional
     fun confirmReservation(reservationId: Long): String {
 
         val reservation = reservationService.get(reservationId)
-
-        // 비관락이 들어감
-        val user = userService.getUserWithLock(reservation.userId)
-
-        concertService.get(reservation.concert.id)
-
-        val seat = seatService.get(reservation.seat.id)!!
-
         val queue = queueService.get(reservation.userId)
+        val user = userService.getUserWithLock(reservation.userId) // 비관락이 들어감
+        val point = userService.getPoint(user.id)
+
+        validateReservation(reservation, queue)
+
+        pointService.use(point, reservation)
+
+        paymentService.save(point, reservation)
+
+        reservation.status = ReservationStatus.CONFIRMED
+        val objectMapper = ObjectMapper()
+        eventPublisher.publish(ReservationEvent.from(reservation))
+        outboxProducer.publish(OutboxEvent(reservation, objectMapper = objectMapper))
+
+        //대기열 삭제
+        queueService.delete(queue)
+
+        return ReservationMessage.CONFIRM.message
+    }
+
+    fun validateReservation(reservation: Reservation, queue: Queue) {
+        concertService.get(reservation.concert.id)
+        val seat = seatService.get(reservation.seat.id)!!
 
         if (reservation.createdAt?.plusMinutes(5)!!.isBefore(LocalDateTime.now())) {
             //대기열 삭제
@@ -56,42 +74,10 @@ class ReservationFacade (
             throw IllegalArgumentException("만료된 대기열 토큰입니다.")
         }
 
-
         // 상태를 결제 완료로 변경
         if (reservation.status != ReservationStatus.RESERVED) {
             throw IllegalArgumentException("결제 완료 처리를 할 수 없는 상태입니다.")
         }
 
-        val point = userService.getPoint(user.id)
-
-        // 포인트 잔액이 좌석 금액보다 적으면 예외 처리
-        if (point.amount < reservation.seat.price) {
-            throw IllegalArgumentException("포인트 잔액이 부족합니다.")
-        }
-
-        // 포인트 차감
-        point.amount -= reservation.seat.price
-        pointService.save(point)
-
-        // 결제 정보 저장
-        val payment = Payment(
-            userId = reservation.userId,
-            reservationId = reservation.id,
-            amount = point.amount,
-            type = PaymentType.SPEND
-        )
-        // 히스토리 저장
-        paymentService.save(payment)
-
-        // 예약 정보 저장
-        reservation.status = ReservationStatus.CONFIRMED
-//        reservationService.save(reservation)
-        eventPublisher.publish(ReservationEvent.from(reservation))
-
-
-        //대기열 삭제
-        queueService.delete(queue)
-
-        return ReservationMessage.CONFIRM.message
     }
 }

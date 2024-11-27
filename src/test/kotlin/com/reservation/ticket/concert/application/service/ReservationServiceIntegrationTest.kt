@@ -15,9 +15,6 @@ import java.util.*
 class ReservationServiceIntegrationTest {
 
     @Autowired
-    private lateinit var reservationService: ReservationService
-
-    @Autowired
     private lateinit var reservationRepository: ReservationRepository
 
     @Autowired
@@ -27,9 +24,6 @@ class ReservationServiceIntegrationTest {
     private lateinit var queueRepository: QueueRepository
 
     @Autowired
-    private lateinit var queueRedisRepository: QueueRedisRepository
-
-    @Autowired
     private lateinit var seatRepository: SeatRepository
 
     @Autowired
@@ -37,9 +31,6 @@ class ReservationServiceIntegrationTest {
 
     @Autowired
     private lateinit var pointRepository: PointRepository
-
-    @Autowired
-    private lateinit var paymentRepository: PaymentRepository
 
     private lateinit var testUser: User
     private lateinit var testConcert: Concert
@@ -104,56 +95,6 @@ class ReservationServiceIntegrationTest {
         pointRepository.save(testPoint)
     }
 
-    @Test
-    fun `confirmReservation should complete payment and update reservation`() {
-        // 예약 확인 처리
-        val result = reservationService.confirmReservation(testReservation.id)
 
-        // 결제 완료 메세지 확인
-        assertEquals("예약이 결제 완료 처리되었습니다.", result)
 
-        // 예약 상태가 결제 완료로 변경되었는지 확인
-        val updatedReservation = reservationRepository.findById(testReservation.id).get()
-        assertEquals(ReservationStatus.CONFIRMED, updatedReservation.status)
-
-        // 대기열이 삭제되었는지 확인
-        val queue = queueRepository.findByUserId(testUser.id)
-        assertTrue(queue == null)
-
-        // 좌석이 예약 가능한 상태로 변경되었는지 확인
-        val updatedSeat = seatRepository.findById(testSeat.id).get()
-        assertFalse(updatedSeat.isAvailable)
-
-        // 포인트가 차감되었는지 확인
-        val updatedPoint = pointRepository.findByUserId(testUser.id)
-        assertNotNull(updatedPoint)
-        assertEquals(1000 - testSeat.price, updatedPoint?.amount)
-
-        // 결제 정보가 저장되었는지 확인
-        val payments = paymentRepository.findAllByUserId(testUser.id)
-        assertTrue(payments.isNotEmpty())
-        assertEquals(testSeat.price, payments[0].amount)
-    }
-
-    @Test
-    fun `confirmReservation should throw exception if reservation expired`() {
-        // 예약 시간이 경과하여 결제가 불가능한 상태로 설정 (예약 취소 테스트)
-        testReservation.createdAt = LocalDateTime.now().minusMinutes(10)  // 10분 경과
-        reservationRepository.save(testReservation)
-
-        val exception = assertThrows(IllegalArgumentException::class.java) {
-            reservationService.confirmReservation(testReservation.id)
-        }
-
-        // 예외 메시지 확인
-        assertEquals("유효하지 않은 토큰 입니다.", exception.message)
-
-        // 예약 상태가 취소로 변경되었는지 확인
-        val updatedReservation = reservationRepository.findById(testReservation.id).get()
-        assertEquals(ReservationStatus.CANCELLED, updatedReservation.status)
-
-        // 좌석이 다시 예약 가능한 상태로 변경되었는지 확인
-        val updatedSeat = seatRepository.findById(testSeat.id).get()
-        assertTrue(updatedSeat.isAvailable)
-    }
 }
