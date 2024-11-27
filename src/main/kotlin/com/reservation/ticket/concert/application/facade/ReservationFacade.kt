@@ -1,5 +1,6 @@
 package com.reservation.ticket.concert.application.facade
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.reservation.ticket.concert.application.service.ConcertService
 import com.reservation.ticket.concert.application.service.PaymentService
 import com.reservation.ticket.concert.application.service.PointService
@@ -12,6 +13,8 @@ import com.reservation.ticket.concert.domain.Reservation
 import com.reservation.ticket.concert.domain.ReservationMessage
 import com.reservation.ticket.concert.domain.ReservationStatus
 import com.reservation.ticket.concert.infrastructure.event.EventPublisher
+import com.reservation.ticket.concert.infrastructure.event.OutboxEvent
+import com.reservation.ticket.concert.infrastructure.event.OutboxProducer
 import com.reservation.ticket.concert.infrastructure.event.ReservationEvent
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -27,6 +30,7 @@ class ReservationFacade (
     private val pointService: PointService,
     private val paymentService: PaymentService,
     private val eventPublisher: EventPublisher<ReservationEvent>,
+    private val outboxProducer: OutboxProducer,
     ){
     // 결제 및 예약 상태 변경
     @Transactional
@@ -44,7 +48,9 @@ class ReservationFacade (
         paymentService.save(point, reservation)
 
         reservation.status = ReservationStatus.CONFIRMED
+        val objectMapper = ObjectMapper()
         eventPublisher.publish(ReservationEvent.from(reservation))
+        outboxProducer.publish(OutboxEvent(reservation, objectMapper = objectMapper))
 
         //대기열 삭제
         queueService.delete(queue)
