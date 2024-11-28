@@ -15,15 +15,11 @@ import org.testcontainers.utility.DockerImageName
 
 @Configuration
 class RedisConfig {
-    private val redisContainer = GenericContainer(DockerImageName.parse("redis:7.0.5")).apply {
-        withExposedPorts(6379)
-        start() // Start the container when the configuration is loaded
-    }
 
     @Bean
     fun redisConnectionFactory(): RedisConnectionFactory {
-        val redisHost = redisContainer.host
-        val redisPort = redisContainer.getMappedPort(6379)
+        val redisHost = "redis"
+        val redisPort = 6379
         return LettuceConnectionFactory(redisHost, redisPort).apply {
             afterPropertiesSet()
         }

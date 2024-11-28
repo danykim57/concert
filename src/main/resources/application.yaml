@@ -2,23 +2,24 @@ spring:
   application:
     name: concert
 
-  # MySQL Database 설정
+  # H2 Database 설정
   datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/concert  # MySQL DB 연결 주소
-    username: root      # MySQL DB 접속 ID (사용자 지정)
-    password:       # MySQL DB 접속 PW (사용자 지정)
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:concert;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE  # H2 메모리 DB
+    username: sa       # 기본 사용자명
+    password:          # 기본 비밀번호 (빈 값)
 
   # JPA 설정
   jpa:
-    database-platform: org.hibernate.dialect.MySQLDialect
+    database-platform: org.hibernate.dialect.H2Dialect
     hibernate:
       ddl-auto: create            # DB 초기화 전략 (update, none, create, create-drop, validate)
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.MySQLDialect
-#        format_sql: true          # 쿼리 로그 포맷 (정렬)
-#        show_sql: true            # 쿼리 로그 출력
+        dialect: org.hibernate.dialect.H2Dialect
+    #      format_sql: true          # 쿼리 로그 포맷 (정렬)
+    #      show_sql: true            # 쿼리 로그 출력
+
 
   # 카프카 설정
   kafka:

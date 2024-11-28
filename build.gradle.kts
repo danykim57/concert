@@ -28,6 +28,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0")
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
@@ -35,6 +36,11 @@ dependencies {
     implementation("org.testcontainers:testcontainers:1.20.3")
     implementation("com.redis.testcontainers:testcontainers-redis:1.6.4")
     implementation("org.springframework.kafka:spring-kafka")
+    implementation("io.micrometer:micrometer-registry-prometheus")
+
+    implementation("io.github.resilience4j:resilience4j-spring-boot2:2.1.0")
+    implementation("io.github.resilience4j:resilience4j-circuitbreaker:2.1.0")
+    implementation("io.github.resilience4j:resilience4j-all:2.1.0")
 
     implementation("mysql:mysql-connector-java:8.0.32")
     runtimeOnly("com.h2database:h2")

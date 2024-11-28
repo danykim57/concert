@@ -1,0 +1,22 @@
+version: '3'
+services:
+  mysql-db:
+    image: mysql:8.0
+    container_name: mysql-db
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: 'true'
+      MYSQL_DATABASE: mxdb
+      MYSQL_USER: mxdb
+      MYSQL_PASSWORD: mxdb
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - spring-network
+
+networks:
+  spring-network:
+
+volumes:
+  mysql-data:
